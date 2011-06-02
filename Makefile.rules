@@ -1,0 +1,27 @@
+
+$(CORE_TMPLIB)core_debug/%.${CORE_BUILDEXT}.o : $(CORE_SRCLIB)core_debug/%.c
+	@echo "re-compiling: $<"
+	mkdir -p $(@D)
+	$(CC) $(CORE_CCARG) -o $@ $<
+
+$(CORE_TMPLIB)core_debug/%.d: $(CORE_SRCLIB)core_debug/%.c
+	@echo "re-depending: $<"
+	mkdir -p $(@D)
+	@set -e; rm -f $@; \
+	$(CC) -MM $(CORE_CCARGD) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+$(CORE_TMPLIB)core_python/%.${CORE_BUILDEXT}.o : $(CORE_SRCLIB)core_python/%.c
+	@echo "re-compiling: $<"
+	mkdir -p $(@D)
+	$(CC) $(CORE_CCARG) -o $@ $<
+
+$(CORE_TMPLIB)core_python/%.d: $(CORE_SRCLIB)core_python/%.c
+	@echo "re-depending: $<"
+	mkdir -p $(@D)
+	@set -e; rm -f $@; \
+	$(CC) -MM $(CORE_CCARGD) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+	

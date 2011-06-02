@@ -1,0 +1,4 @@
+
+CORE_SRCFILES = $(wildcard $(CORE_SRCLIB)*.c)
+CORE_SRCFILES += $(wildcard $(CORE_SRCLIB)core_debug/*.c)
+CORE_SRCFILES += $(wildcard $(CORE_SRCLIB)core_python/*.c)
