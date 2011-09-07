@@ -1,6 +1,6 @@
 from distutils.core import setup, Extension
 
-module1 = Extension('Core',
+module1 = Extension('_core',
                     define_macros = [('MAJOR_VERSION', '1'),
                                      ('MINOR_VERSION', '0')],
                     include_dirs = ['/usr/local/include', 'include/','src/pylib/'],
@@ -8,8 +8,11 @@ module1 = Extension('Core',
                     library_dirs = ['/usr/local/lib', './'],
                     sources = ['src/pylib/core_main.c'])
 
-setup (name = 'Core',
+setup (name = 'arnovich.core',
        version = '1.0',
-       description = 'Core python module',
-       author = 'Arnovich',
+       description = 'Arnovich Core python module',
+       author = 'Yerik Arnovich',
+	   package_dir = {'': 'src/pylib'},
+	   packages = ['arnovich'],
+	   ext_package = 'arnovich',
        ext_modules = [module1])

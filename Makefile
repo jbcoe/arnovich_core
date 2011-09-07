@@ -21,9 +21,9 @@ DEPFILES = $(subst $(CORE_SRCLIB),$(CORE_TMPLIB),$(CORE_SRCFILES:.c=.d))
 SRCBINFILES=$(wildcard $(SRCBINLIB)*.c)
 DEPBINFILES = $(subst $(SRCBINLIB),$(TMPBINLIB),$(SRCBINFILES:.c=.d))
 
-CORE_CCARG= -x c -I include/ -I ./ -c -fPIC -Wall -I /usr/include/python2.6/ 
+CORE_CCARG= -x c -I include/ -I ./ -c -fPIC -Wall -I /usr/include/python2.7/ 
 CORE_CCARGD=$(CORE_CCARG)
-LNARG=-lpython2.6 -dynamiclib -Wl,-v -dylib -Wl,-dynamic
+LNARG=-lpython2.7 -dynamiclib -Wl,-v -dylib -Wl,-dynamic
 
 CC=/usr/bin/g++
 LN=/usr/bin/g++
@@ -43,14 +43,14 @@ PYLIB_EXT=
 
 ifeq (${BUILD},LINUX64)
 	BUILDLIB=$(HERE)lib64$(DELIM)
-	LNARG=-lpython2.6 -Wl,-v -shared
+	LNARG=-lpython2.7 -Wl,-v -shared
 	EXTLIB=so
 endif
 
 ifeq (${BUILD},CYGWIN)
-	CORE_CCARG= -x c -I include/ -I ./ -c -Wall -I /usr/include/python2.6/
+	CORE_CCARG= -x c -I include/ -I ./ -c -Wall -I /usr/include/python2.7/
 	BUILDLIB=$(HERE)lib$(DELIM)
-	LNARG=-lpython2.6 -Wl,-v -shared
+	LNARG=-lpython2.7 -Wl,-v -shared
 	EXTLIB=dll.a
 endif
 
@@ -78,7 +78,7 @@ else
 	endif
 endif
 
-all: depends lib
+all: depends lib pylib
 
 docs:
 	doxygen core.doxy

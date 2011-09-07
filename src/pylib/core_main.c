@@ -56,12 +56,12 @@ static PyMethodDef CoreMethods[] = {
 	{NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC initCore(void)
+PyMODINIT_FUNC init_core(void)
 {
     PyObject* m;
 
     m = Py_InitModule3(
-    		"Core",
+    		"arnovich._core",
     		CoreMethods,
     		"Module for Core");
 
@@ -80,6 +80,6 @@ int main(int argc, char *argv[])
 
     Py_Initialize();
 
-    initCore();
+    init_core();
     return 0;
 }

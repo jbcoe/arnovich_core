@@ -1,0 +1,10 @@
+
+
+###### ARNOVICH CORE ######
+
+Library for shared common functionality across all Arnovich projects
+
+###### CLEAN BUILD ######
+
+sudo make clean all BUILD=<OSX/LINUX64>
+
