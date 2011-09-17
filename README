@@ -7,7 +7,8 @@ Library for shared common functionality across all Arnovich projects.
 
 #### TODO ####
 
-- create a variant type with python PyObject adapters
+- more work on the Matrix
+- add more types to the variant type
 
 #### HOW TO BUILD ####
 
