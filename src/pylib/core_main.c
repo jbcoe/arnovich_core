@@ -33,9 +33,9 @@ PyObject* Core_set_level(PyObject *self, PyObject *args, PyObject *kwds)
 
 PyObject* Core_set_group(PyObject *self, PyObject *args, PyObject *kwds)
 {
-	int group;
+	char* group;
 
-    if(!PyArg_ParseTuple(args, "i", &group))
+    if(!PyArg_ParseTuple(args, "s", &group))
     {
     	core_setaterror("Invalid debug group input");
         return NULL;

@@ -7,12 +7,25 @@
 #include <core_debug/core_debug.h>
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
-static int      core_debug_level_env = DEBUG_UNDEFINED;
-static int      core_debug_group_env = DEBUG_GROUP_UNDEFINED;
-static FILE*    core_debug_file = 0;
+#define DEBUG_GROUP_ALL       "__ALL__"
 
-int get_core_debug_level_env()
+#define DEBUG_GROUP_SIZE      30
+#define DEBUG_GROUP_SET_SIZE  5
+
+#define CORE_DEBUG_LEVEL_ENV_VAR "DEBUG_LEVEL"
+
+#define CORE_DEBUG_GROUP_ENV_VAR "DEBUG_GROUP"
+
+static int                       core_debug_level_env = DEBUG_UNDEFINED;
+static char                      core_debug_group_env[DEBUG_GROUP_SET_SIZE][DEBUG_GROUP_SIZE] = {"", "", "", "", ""};
+static int                       core_debug_group_set = 0;
+static FILE*                     core_debug_file = NULL;
+
+static int get_core_debug_level_env()
 {
 	if(core_debug_level_env==DEBUG_UNDEFINED)
 	{
@@ -30,32 +43,71 @@ void set_core_debug_level_env(int level)
 	core_debug_level_env = level;
 }
 
-int get_core_debug_group_env()
+void set_core_debug_group_env(char* group)
 {
-	if(core_debug_group_env==DEBUG_GROUP_UNDEFINED)
-	{
-		char* debug_group_env = getenv(CORE_DEBUG_GROUP_ENV_VAR);
-		if(debug_group_env)
-		{
-			core_debug_group_env = atoi(debug_group_env);
-		}
-	}
-	return core_debug_group_env;
+    core_debug_group_set = 0;
+    char* tok = strtok(group, "|");
+    while(tok && (core_debug_group_set < DEBUG_GROUP_SET_SIZE))
+    {
+        strncpy(core_debug_group_env[core_debug_group_set], tok, DEBUG_GROUP_SIZE);
+        core_debug_group_set++;
+        tok = strtok(NULL, "|");
+    }
 }
 
-void set_core_debug_group_env(int group)
+static int is_core_debug_group(char* group)
 {
-	core_debug_group_env = group;
+    if(!core_debug_group_set)
+    {
+        char* debug_group_env = getenv(CORE_DEBUG_GROUP_ENV_VAR);
+        if(debug_group_env)
+        {
+            set_core_debug_group_env(debug_group_env);
+        }
+    }
+    int i=0;
+    for(;i<core_debug_group_set;++i)
+    {
+        if(!strncmp(core_debug_group_env[i], group, DEBUG_GROUP_SIZE))
+        {
+            return 1;
+        }
+    }
+	return 0;
 }
 
-FILE* get_core_debug_file()
+void set_core_debug_file(char* file)
 {
-	return core_debug_file;
+	core_debug_file = fopen(file,"a");
 }
 
-void set_core_debug_file(FILE* file)
+void unset_core_debug_file()
 {
-	core_debug_file = file;
+    if(core_debug_file) 
+    { 
+        fclose(core_debug_file); 
+        set_core_debug_file(0); 
+    }
+}
+
+void debug(int level, char* core_debug_group, char* format, ...)
+{
+    if(get_core_debug_level_env()>=level && 
+       (is_core_debug_group(DEBUG_GROUP_ALL) || 
+        is_core_debug_group(core_debug_group)))
+    {
+        va_list vl;
+        va_start(vl, format);
+        if(core_debug_file) 
+        { 
+            fprintf (core_debug_file, format, __FILE__, __LINE__, vl); 
+        } 
+        else 
+        { 
+            printf(format, __FILE__, __LINE__, vl); 
+        } 
+        va_end(vl);
+    };
 }
 
 #endif
