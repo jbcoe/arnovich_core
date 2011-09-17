@@ -24,4 +24,12 @@ $(CORE_TMPLIB)core_python/%.d: $(CORE_SRCLIB)core_python/%.c
 	$(CC) -MM $(CORE_CCARGD) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
+
+$(TMPBINLIB)%.d: $(SRCBINLIB)%.c
+	@echo "re-depending: $<"
+	mkdir -p $(@D)
+	@set -e; rm -f $@; \
+	$(CC) -MM $(CORE_CCARG) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(BUILDBIN)\1 $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
 	

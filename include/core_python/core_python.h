@@ -1,5 +1,6 @@
 /*
  * @file core_python.h
+ * @brief Python utility functions
  */
 
 #ifndef CORE_PYTHON_H_

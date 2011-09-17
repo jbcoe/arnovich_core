@@ -1,64 +1,76 @@
 
+# default build config
 BUILD ?= OSX
+# DEBUG build on as default
 DEBUG ?= 1
 
+# where to put the build files
 BUILDDIR ?= build
+# where to put the test files
 TESTDIR ?= test
 
+# the name of the lib
+LIBNAME=arnovich_core
+
+# source dirs and files
 CORE_SRCLIB=src/lib/
 CORE_TMPLIB=$(BUILDDIR)/src/lib/
 SRCBINLIB=src/bin/
 TMPBINLIB=$(BUILDDIR)/src/bin/
-MKDIR=mkdir -p
-
 include Makefile.files
 
+# dependencies and objects
 CORE_BUILDEXT = $(BUILD).DEBUG$(DEBUG)
 OBJFILES = $(subst $(CORE_SRCLIB),$(CORE_TMPLIB),$(CORE_SRCFILES:.c=.${CORE_BUILDEXT}.o))
-
 DEPFILES = $(subst $(CORE_SRCLIB),$(CORE_TMPLIB),$(CORE_SRCFILES:.c=.d))
-
 SRCBINFILES=$(wildcard $(SRCBINLIB)*.c)
 DEPBINFILES = $(subst $(SRCBINLIB),$(TMPBINLIB),$(SRCBINFILES:.c=.d))
 
-CORE_CCARG= -x c -I include/ -I ./ -c -fPIC -Wall -I /usr/include/python2.7/ 
-CORE_CCARGD=$(CORE_CCARG)
-LNARG=-lpython2.7 -dynamiclib -Wl,-v -dylib -Wl,-dynamic
-
+# some common build stuff
+MKDIR=mkdir -p
 CC=/usr/bin/g++
 LN=/usr/bin/g++
-EXTLIB=dylib
 PRELIB=lib
-DELIM=/
-
-HERE=/usr/
-BUILDLIB=$(HERE)lib$(DELIM)
-BUILDBIN=$(TESTDIR)$(DELIM)bin$(DELIM)
-
-NAME=arnovich_core
-
-CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(NAME)
-
 PYLIB_EXT=
 
+# OSX build
+ifeq (${BUILD},OSX)
+	BUILDLIB=/usr/lib/
+	BUILDBIN=$(TESTDIR)/bin/
+	CORE_CCARG= -x c -I include/ -I ./ -c -fPIC -Wall -I /usr/include/python2.7/ 
+	CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
+	LNARG=-lpython2.7 -dynamiclib -Wl,-v -dylib -Wl,-dynamic
+	EXTLIB=dylib
+endif
+
+# LINUX 64-bit build
 ifeq (${BUILD},LINUX64)
-	BUILDLIB=$(HERE)lib64$(DELIM)
+	BUILDLIB=/usr/lib64/
+	BUILDBIN=$(TESTDIR)/bin/
+	CORE_CCARG= -x c -I include/ -I ./ -c -fPIC -Wall -I /usr/include/python2.7/ 
+	CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
 	LNARG=-lpython2.7 -Wl,-v -shared
 	EXTLIB=so
 endif
 
+# CYGWIN build
 ifeq (${BUILD},CYGWIN)
+	BUILDLIB=/usr/lib/
+	BUILDBIN=$(TESTDIR)/bin/
 	CORE_CCARG= -x c -I include/ -I ./ -c -Wall -I /usr/include/python2.7/
-	BUILDLIB=$(HERE)lib$(DELIM)
+	CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
 	LNARG=-lpython2.7 -Wl,-v -shared
 	EXTLIB=dll.a
 endif
 
-ifeq (${BUILD},WIN32)
+# MINGW build - not sure it works anymore
+ifeq (${BUILD},MINGW)
+	BUILDBIN=$(TESTDIR)\\bin\\
+	BUILDLIB=.\\
 	CC=gcc
 	LN=gcc
 	CORE_CCARG= -x c -I include/ -I ./ -c -Wall -I "E:\\Python26\\include" 
-	BUILDLIB=.\\
+	CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
 	LNARG=-L"E:\\Python26\\libs" -lpython26 -Wl,-v -shared
 	EXTLIB=dll
 	PYLIB_EXT=--compiler=mingw32
@@ -67,7 +79,6 @@ endif
 ifeq (${DEBUG},1)
 	CORE_CCARGBIN += -g -DDEBUG=${DEBUG}
 	CORE_CCARG += -g  -DDEBUG=${DEBUG}
-	CORE_CCARGD += -DDEBUG=${DEBUG}
 else
 	ifeq (${DEBUG},2)
 		CORE_CCARGBIN += -g
@@ -78,9 +89,14 @@ else
 	endif
 endif
 
+
+#### various targets
+
 all: depends lib pylib
 
+.PHONY: docs
 docs:
+	$(MKDIR) docs
 	doxygen core.doxy
 
 pylib:
@@ -91,31 +107,16 @@ clean:
 	rm -rf $(BUILDDIR)
 	rm -rf $(BUILDBIN)
 
-cleanobjs:
-	find $(CORE_TMPLIB) -name '*.o' -exec rm {} \;
-	find $(TMPBINLIB) -name '*.o' -exec rm {} \;
-
-cleandeps:
-	find $(CORE_TMPLIB) -name '*.d' -exec rm {} \;
-	find $(TMPBINLIB) -name '*.d' -exec rm {}  \;
-	
 depends: $(DEPFILES) $(DEPBINFILES)
 
-lib: $(BUILDLIB)${PRELIB}${NAME}.$(EXTLIB)
+lib: $(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB)
 	
-$(TMPBINLIB)%.d: $(SRCBINLIB)%.c
-	@echo "re-depending: $<"
-	mkdir -p $(@D)
-	@set -e; rm -f $@; \
-	$(CC) -MM $(CORE_CCARGD) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,$(BUILDBIN)\1 $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-
 include Makefile.rules
 
 include $(DEPFILES)
 include $(DEPBINFILES)
 
-$(BUILDLIB)${PRELIB}${NAME}.$(EXTLIB): $(OBJFILES)
+$(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB): $(OBJFILES)
 	$(MKDIR) $(BUILDLIB)
 	$(LN) $(LNARG) -o $@ $(OBJFILES) $(LNARG)
+
