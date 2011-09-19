@@ -9,7 +9,7 @@ variant core_python_py_to_variant(PyObject* o)
 {
     if(PyInt_Check(o))
     {
-        return core_types_variant_int(PyInt_AsLong(o));
+        return variant_from_int(PyInt_AsLong(o));
     } else if(PyString_Check(o)) {
         char *s = PyString_AsString(o);
         if(s)
@@ -17,13 +17,13 @@ variant core_python_py_to_variant(PyObject* o)
             PyObject *p = PyInt_FromString(s, NULL, 0);
             if(p)
             {
-                return core_types_variant_int(PyInt_AsLong(p));
+                return variant_from_int(PyInt_AsLong(p));
             }
         }
     }
     if(PyFloat_Check(o))
     {
-        return core_types_variant_double(PyFloat_AsDouble(o));
+        return variant_from_double(PyFloat_AsDouble(o));
     } else if(PyString_Check(o)) {
         PyObject *s = PyObject_Str(o);
         if(s)
@@ -31,7 +31,7 @@ variant core_python_py_to_variant(PyObject* o)
             PyObject *p = PyFloat_FromString(s, NULL);
             if(p)
             {
-                return core_types_variant_double(PyFloat_AsDouble(p));
+                return variant_from_double(PyFloat_AsDouble(p));
             }
         }
     }
@@ -40,13 +40,13 @@ variant core_python_py_to_variant(PyObject* o)
 
 PyObject* core_python_variant_to_py(variant v)
 {
-    if(core_types_variant_is_int(v))
+    if(variant_is_int(v))
     {
-        return PyInt_FromLong(core_types_int(v));
+        return PyInt_FromLong(variant_as_int(v));
     }
-    if(core_types_variant_is_double(v))
+    if(variant_is_double(v))
     {
-        return PyFloat_FromDouble(core_types_double(v));
+        return PyFloat_FromDouble(variant_as_double(v));
     }
     return NULL;
 }

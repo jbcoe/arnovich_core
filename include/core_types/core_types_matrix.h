@@ -1,6 +1,7 @@
 
 /*
  * @file core_types_matrix.h
+ * @brief simple two_dimensional matrix
  */
 
 #ifndef CORE_TYPES_MATRIX_H
@@ -8,7 +9,6 @@
 
 #include <core_types/core_types_variant.h>
 
-// two-dimensional matrix
 typedef struct core_types_matrix
 {
     variant* m_values;
@@ -16,13 +16,37 @@ typedef struct core_types_matrix
     unsigned int m_height; //y-dimension
 } matrix;
 
-matrix core_types_matrix_init(unsigned int width, unsigned int height);
+#define MATRIX_USE_MACROS
 
-void core_types_matrix_free(matrix m);
+matrix matrix_init(unsigned int width, unsigned int height);
 
-variant core_types_matrix_get(matrix m, unsigned int i, unsigned int j);
+matrix matrix_copy(matrix m);
 
-void core_types_matrix_set(matrix m, unsigned int i, unsigned int j, variant v);
+void matrix_free(matrix m);
+
+/*
+ * @brief Returns a string representation of the matrix.
+ * Note: Returned array is a local statically allocated array, so watch out!
+ */
+char* matrix_to_string(matrix m);
+
+#ifdef MATRIX_USE_MACROS
+
+#define matrix_get_safe(m,i,j) (((i < m.m_width) && (j < m.m_height))?m.m_values[j*m.m_width+i]:VARIANT_NIL)
+
+#define matrix_get(m,i,j) (m).m_values[j*(m).m_width+i]
+
+#define matrix_set_safe(m,i,j,v) if((i < m.m_width) && (j < m.m_height)){m.m_values[j*m.m_width+i] = v;}
+
+#define matrix_set(m,i,j,v) (m).m_values[j*(m).m_width+i] = v;
+
+#else
+
+variant matrix_get(matrix m, unsigned int i, unsigned int j);
+
+void matrix_set(matrix m, unsigned int i, unsigned int j, variant v);
+
+#endif
 
 #endif
 

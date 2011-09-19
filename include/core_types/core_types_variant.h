@@ -30,17 +30,43 @@ struct core_types_variant
 };
 typedef struct core_types_variant variant;
 
-static variant VARIANT_NIL = {CORE_TYPES_VARIANT_INT, {.m_i=0} };
+/*
+ * @brief Returns a string representation of a variant
+ * Note: Returned array is a local statically allocated array, so watch out!
+ */
+char* variant_to_string(variant v);
 
-variant core_types_variant_double(double d);
+#define VARIANT_NIL (variant){CORE_TYPES_VARIANT_INT, {.m_i=0} };
 
-variant core_types_variant_int(int i);
+#define VARIANT_USE_MACROS
 
-int core_types_int(variant v);
+#ifdef VARIANT_USE_MACROS
 
-double core_types_double(variant v);
+#define variant_from_int(i) (variant){CORE_TYPES_VARIANT_INT, {.m_i=i}}
 
-int core_types_variant_is_int(variant v);
+#define variant_from_double(d) (variant){CORE_TYPES_VARIANT_DOUBLE, {.m_d=d}}
 
-int core_types_variant_is_double(variant v);
+#define variant_as_int(v) ((CORE_TYPES_VARIANT_INT == v.m_type)?v.m_v.m_i:((CORE_TYPES_VARIANT_DOUBLE == v.m_type)?((int)v.m_v.m_i):0))
+
+#define variant_as_double(v) ((CORE_TYPES_VARIANT_DOUBLE == v.m_type)?v.m_v.m_d:((CORE_TYPES_VARIANT_INT == v.m_type)?((double)v.m_v.m_i):0.0))
+
+#define variant_is_int(v) (CORE_TYPES_VARIANT_INT == v.m_type)
+
+#define variant_is_double(v) (CORE_TYPES_VARIANT_DOUBLE == v.m_type)
+
+#else
+
+variant variant_from_double(double d);
+
+variant variant_from_int(int i);
+
+int variant_as_int(variant v);
+
+double variant_as_double(variant v);
+
+int variant_is_int(variant v);
+
+int variant_is_double(variant v);
+
+#endif
 

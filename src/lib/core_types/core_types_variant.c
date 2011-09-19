@@ -6,7 +6,30 @@
 
 #include <core_types/core_types_variant.h>
 
-variant core_types_variant_double(double d)
+#include <stdio.h>
+#include <string.h>
+
+char* variant_to_string(variant v)
+{
+    static char str[50];
+    switch(v.m_type)
+    {
+    case CORE_TYPES_VARIANT_INT:
+        sprintf(str, "%i", v.m_v.m_i);
+        break;
+    case CORE_TYPES_VARIANT_DOUBLE:
+        sprintf(str, "%f", v.m_v.m_d);
+        break;
+    default:
+        strcpy(str, "");
+        break;
+    }
+    return str;
+}
+
+#ifndef VARIANT_USE_MACROS
+
+variant variant_from_double(double d)
 {
     variant v;
     v.m_type = CORE_TYPES_VARIANT_DOUBLE;
@@ -14,7 +37,7 @@ variant core_types_variant_double(double d)
     return v;
 }
 
-variant core_types_variant_int(int i)
+variant variant_from_int(int i)
 {
     variant v;
     v.m_type = CORE_TYPES_VARIANT_INT;
@@ -22,32 +45,41 @@ variant core_types_variant_int(int i)
     return v;
 }
 
-int core_types_int(variant v)
+int variant_as_int(variant v)
 {
     if(CORE_TYPES_VARIANT_INT == v.m_type)
     {
         return v.m_v.m_i;
     }
+    if(CORE_TYPES_VARIANT_DOUBLE == v.m_type)
+    {
+        return (int)v.m_v.m_d;
+    }
     return 0;
 }
 
-double core_types_double(variant v)
+double variant_as_double(variant v)
 {
     if(CORE_TYPES_VARIANT_DOUBLE == v.m_type)
     {
         return v.m_v.m_d;
     }
+    if(CORE_TYPES_VARIANT_INT == v.m_type)
+    {
+        return (double)v.m_v.m_i;
+    }
     return 0.0;
 }
 
-int core_types_variant_is_int(variant v)
+int variant_is_int(variant v)
 {
     return (CORE_TYPES_VARIANT_INT == v.m_type);
 }
 
-int core_types_variant_is_double(variant v)
+int variant_is_double(variant v)
 {
     return (CORE_TYPES_VARIANT_DOUBLE == v.m_type);
 }
 
+#endif
 

@@ -64,6 +64,10 @@ static int is_core_debug_group(char* group)
         {
             set_core_debug_group_env(debug_group_env);
         }
+        if(!core_debug_group_set)
+        {
+            return 1;
+        }
     }
     int i=0;
     for(;i<core_debug_group_set;++i)
