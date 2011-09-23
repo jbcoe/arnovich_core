@@ -4,6 +4,9 @@
  * @brief generic variant type
  */
 
+#define COMPARE_EPSILON 0.000000001
+#define COMPARE_DOUBLE(a,b) (fabs(a-b) < COMPARE_EPSILON)
+
 typedef enum
 {
     CORE_TYPES_VARIANT_INT       = 0,
@@ -35,6 +38,8 @@ typedef struct core_types_variant variant;
  * Note: Returned array is a local statically allocated array, so watch out!
  */
 char* variant_to_string(variant v);
+
+int variant_equal(variant a, variant b);
 
 #define VARIANT_NIL (variant){CORE_TYPES_VARIANT_INT, {.m_i=0} };
 

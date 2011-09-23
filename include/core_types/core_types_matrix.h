@@ -24,11 +24,19 @@ matrix matrix_copy(matrix m);
 
 void matrix_free(matrix m);
 
+int matrix_compare(matrix a, matrix b);
+
+matrix matrix_identity(int n);
+
+#define MATRIX_IDENTITY(N) matrix_identity(N)
+
 /*
  * @brief Returns a string representation of the matrix.
  * Note: Returned array is a local statically allocated array, so watch out!
  */
 char* matrix_to_string(matrix m);
+
+void matrix_move_rows(matrix m, int row1, int row2);
 
 #ifdef MATRIX_USE_MACROS
 

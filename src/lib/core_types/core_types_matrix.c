@@ -22,16 +22,6 @@ matrix matrix_copy(matrix m)
 {
     matrix mm = matrix_init(m.m_width,m.m_height);
     memcpy(mm.m_values, m.m_values, sizeof(variant)*m.m_width*m.m_height);
-    /*
-    int i, j;
-    for(i=0;i<m.m_width;++i)
-    {
-        for(j=0;j<m.m_height;++j)
-        {
-            matrix_set(mm,i,j,matrix_get(m,i,j));
-        }
-    }
-    */
     return mm;
 }
 
@@ -41,6 +31,37 @@ void matrix_free(matrix m)
     m.m_height = 0;
     free(m.m_values);
     m.m_values = NULL;
+}
+
+int matrix_compare(matrix a, matrix b)
+{
+    if((a.m_width == b.m_width) && (a.m_height == b.m_height))
+    {
+        int i,j;
+        for(i=0;i<a.m_width;++i)
+        {
+            for(j=0;j<a.m_height;++j)
+            {
+                if(!(variant_equal(matrix_get(a,i,j), matrix_get(b,i,j))))
+                {
+                    return 0;
+                }
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
+
+matrix matrix_identity(int n)
+{
+    matrix m = matrix_init(n,n);
+    int i;
+    for(i=0;i<n;++i)
+    {
+        matrix_set(m,i,i,variant_from_int(1));
+    }
+    return m;
 }
 
 char* matrix_to_string(matrix m)
@@ -60,6 +81,17 @@ char* matrix_to_string(matrix m)
     }
     strcat(str, "]");
     return str;
+}
+
+void matrix_move_rows(matrix m, int row1, int row2)
+{
+    int i;
+    for(i=0; i<m.m_width; ++i)
+    {
+        variant tmp = matrix_get(m, i, row1);
+        matrix_set(m, i, row1, matrix_get(m, i, row2));
+        matrix_set(m, i, row2, tmp);
+    }
 }
 
 #ifndef MATRIX_USE_MACROS
