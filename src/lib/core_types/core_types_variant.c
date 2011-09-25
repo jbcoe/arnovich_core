@@ -30,18 +30,32 @@ char* variant_to_string(variant v)
 
 int variant_equal(variant a, variant b)
 {
-    if(a.m_type == b.m_type)
+    switch(a.m_type)
     {
-        switch(a.m_type)
+    case CORE_TYPES_VARIANT_INT:
+        switch(b.m_type)
         {
         case CORE_TYPES_VARIANT_INT:
             return (a.m_v.m_i == b.m_v.m_i);
         case CORE_TYPES_VARIANT_DOUBLE:
-            //return (a.m_v.m_d == b.m_v.m_d);
+            return COMPARE_DOUBLE(a.m_v.m_i, b.m_v.m_d);
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_DOUBLE:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_INT:
+            return COMPARE_DOUBLE(a.m_v.m_d, b.m_v.m_i);
+        case CORE_TYPES_VARIANT_DOUBLE:
             return COMPARE_DOUBLE(a.m_v.m_d, b.m_v.m_d);
         default:
             break;
         }
+        break;
+    default:
+        break;
     }
     return 0;
 }

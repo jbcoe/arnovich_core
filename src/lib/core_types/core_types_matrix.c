@@ -94,6 +94,44 @@ void matrix_move_rows(matrix m, int row1, int row2)
     }
 }
 
+matrix matrix_get_column(matrix m, int col)
+{
+    matrix c = matrix_init(1, m.m_height);
+    if(col < m.m_width)
+    {
+        int i;
+        for(i = 0; i<m.m_height; ++i)
+        {
+            matrix_set(c, 0, i, matrix_get(m, col, i));
+        }
+    }
+    return c;
+}
+
+matrix matrix_get_row(matrix m, int row)
+{
+    matrix c = matrix_init(m.m_width, 1);
+    if(row < m.m_height)
+    {
+        int i;
+        for(i = 0; i<m.m_width; ++i)
+        {
+            matrix_set(c, i, 0, matrix_get(m, i, row));
+        }
+    }
+    return c;
+}
+
+void matrix_replace_row(matrix a, int row1, matrix b, int row2)
+{
+    int i, n;
+    n = (a.m_width > b.m_width)?b.m_width:a.m_width;
+    for(i=0; i<n; ++i)
+    {
+        matrix_set(a, i, row1, matrix_get(b, i, row2)) 
+    }
+}
+
 #ifndef MATRIX_USE_MACROS
 
 variant matrix_get(matrix m, unsigned int i, unsigned int j)

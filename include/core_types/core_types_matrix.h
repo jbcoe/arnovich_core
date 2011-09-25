@@ -38,15 +38,21 @@ char* matrix_to_string(matrix m);
 
 void matrix_move_rows(matrix m, int row1, int row2);
 
+matrix matrix_get_column(matrix m, int col);
+
+matrix matrix_get_row(matrix m, int row);
+
+void matrix_replace_row(matrix a, int row1, matrix b, int row2);
+
 #ifdef MATRIX_USE_MACROS
 
-#define matrix_get_safe(m,i,j) (((i < m.m_width) && (j < m.m_height))?m.m_values[j*m.m_width+i]:VARIANT_NIL)
+#define matrix_get_safe(m,i,j) (((i < (m).m_width) && (j < (m).m_height))?(m).m_values[(j)*m.m_width+i]:VARIANT_NIL)
 
-#define matrix_get(m,i,j) (m).m_values[j*(m).m_width+i]
+#define matrix_get(m,i,j) (m).m_values[(j)*(m).m_width+i]
 
-#define matrix_set_safe(m,i,j,v) if((i < m.m_width) && (j < m.m_height)){m.m_values[j*m.m_width+i] = v;}
+#define matrix_set_safe(m,i,j,v) if((i < (m).m_width) && (j < (m).m_height)){(m).m_values[(j)*m.m_width+i] = v;}
 
-#define matrix_set(m,i,j,v) (m).m_values[j*(m).m_width+i] = v;
+#define matrix_set(m,i,j,v) (m).m_values[(j)*(m).m_width+i] = v;
 
 #else
 
