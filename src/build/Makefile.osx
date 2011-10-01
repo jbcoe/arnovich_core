@@ -1,0 +1,17 @@
+
+# OSX build
+BUILDLIB=/usr/lib/
+BUILDBIN=$(TESTDIR)/bin/
+CC=/usr/bin/g++
+LN=/usr/bin/g++
+CORE_CCARG= -x c -I include/ -I ./ -c -fPIC -Wall
+CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
+LNARG=-dynamiclib -Wl,-v -dylib -Wl,-dynamic
+EXTLIB=dylib
+PYLIB_EXT=
+
+ifdef USE_PYTHON
+	CORE_CCARG += -I /usr/include/python2.7/
+	LNARG += -lpython2.7
+endif
+

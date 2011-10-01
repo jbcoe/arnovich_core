@@ -1,0 +1,87 @@
+
+# default libname
+ifndef LIBNAME
+	ERROR = "LIBNAME not defined"
+endif
+	
+ifdef ERROR
+	ERR = $(error BUILD ERROR:  ${ERROR} not defined)
+endif
+
+# default build config
+BUILD ?= OSX
+# DEBUG build on as default
+DEBUG ?= 1
+
+# where to put the build files
+BUILDDIR ?= build
+# where to put the test files
+TESTDIR ?= test
+
+# source dirs and files
+CORE_SRCLIB=src/lib/
+CORE_TMPLIB=$(BUILDDIR)/src/lib/
+SRCBINLIB=src/bin/
+TMPBINLIB=$(BUILDDIR)/src/bin/
+include Makefile.files
+
+# dependencies and objects
+CORE_BUILDEXT = $(BUILD).DEBUG$(DEBUG)
+OBJFILES = $(subst $(CORE_SRCLIB),$(CORE_TMPLIB),$(CORE_SRCFILES:.c=.${CORE_BUILDEXT}.o))
+DEPFILES = $(subst $(CORE_SRCLIB),$(CORE_TMPLIB),$(CORE_SRCFILES:.c=.d))
+SRCBINFILES=$(wildcard $(SRCBINLIB)*.c)
+DEPBINFILES = $(subst $(SRCBINLIB),$(TMPBINLIB),$(SRCBINFILES:.c=.d))
+
+# some common build stuff
+MKDIR=mkdir -p
+PRELIB=lib
+
+LBUILD=$(shell echo $(BUILD) | tr A-Z a-z)
+include Makefile.${LBUILD}
+
+ifeq (${DEBUG},1)
+	CORE_CCARGBIN += -g -DDEBUG=${DEBUG}
+	CORE_CCARG += -g  -DDEBUG=${DEBUG}
+else
+	ifeq (${DEBUG},2)
+		CORE_CCARGBIN += -g
+		CORE_CCARG += -g
+	else
+		CORE_CCARGBIN += -O1
+		CORE_CCARG += -O1
+	endif
+endif
+
+include Makefile.rules
+
+include $(DEPFILES)
+include $(DEPBINFILES)
+
+#### various targets
+
+.PHONY: build_error
+build_error: ; $(ERR)
+
+all: build_error depends lib pylib
+
+.PHONY: docs
+docs: build_error
+	$(MKDIR) docs
+	doxygen core.doxy
+
+pylib: build_error
+	python src/pylib/setup.py build $(PYLIB_EXT)
+	python src/pylib/setup.py install
+
+clean: build_error
+	rm -rf $(BUILDDIR)
+	rm -rf $(BUILDBIN)
+
+depends: build_error $(DEPFILES) $(DEPBINFILES)
+
+lib: build_error $(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB)
+
+$(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB): build_error $(OBJFILES)
+	$(MKDIR) $(BUILDLIB)
+	$(LN) $(LNARG) -o $@ $(OBJFILES) $(LNARG)
+

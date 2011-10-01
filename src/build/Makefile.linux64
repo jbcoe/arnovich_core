@@ -1,0 +1,17 @@
+
+# LINUX 64-bit build
+BUILDLIB=/usr/lib64/
+BUILDBIN=$(TESTDIR)/bin/
+CC=/usr/bin/g++
+LN=/usr/bin/g++
+CORE_CCARG= -x c -I include/ -I ./ -c -fPIC -Wall
+CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
+LNARG=-Wl,-v -shared
+EXTLIB=so
+PYLIB_EXT=
+
+ifdef USE_PYTHON
+	CORE_CCARG += -I /usr/include/python2.7/
+	LNARG += -lpython2.7
+endif
+
