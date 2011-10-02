@@ -28,6 +28,11 @@ ifdef USE_MATH
 	LARG += -larnovich_math
 endif
 
+ifdef USE_BS
+	CARG += -I ../bs/include
+	LARG += -larnovich_bs
+endif
+
 CCARGBIN = $(CARG) $(LARG) -L$(BUILDLIB) -l$(LIBNAME)
 CCARG = $(CARG) -c -fPIC
 LNARG = $(LARG) -Wl,-v -shared
