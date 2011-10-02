@@ -1,0 +1,4 @@
+
+dir="$( cd "$( dirname "$0" )" && pwd )"
+make -f ${dir}/Makefile.core -I ${dir} $*
+

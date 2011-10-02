@@ -1,17 +1,18 @@
 
 # MINGW build - not sure it works anymore
+# NOT maintained anymore but keeping it around
 BUILDBIN=$(TESTDIR)\\bin\\
 BUILDLIB=.\\
 CC=gcc
 LN=gcc
-CORE_CCARG= -x c -I include/ -I ./ -c -Wall
-CORE_CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
+CCARG= -x c -I include/ -I ./ -c -Wall
+CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
 LNARG=-Wl,-v -shared
 EXTLIB=dll
 PYLIB_EXT=--compiler=mingw32
 
 ifdef USE_PYTHON
-	CORE_CCARG += -I "E:\\Python27\\include"
+	CCARG += -I "E:\\Python27\\include"
 	LNARG += -L"E:\\Python27\\libs" -lpython27
 endif
 

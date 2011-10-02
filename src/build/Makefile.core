@@ -19,18 +19,28 @@ BUILDDIR ?= build
 TESTDIR ?= test
 
 # source dirs and files
-CORE_SRCLIB=src/lib/
-CORE_TMPLIB=$(BUILDDIR)/src/lib/
+SRCLIB=src/lib/
 SRCBINLIB=src/bin/
-TMPBINLIB=$(BUILDDIR)/src/bin/
-include Makefile.files
+SRCTESTLIB=test/
+TMPLIB=$(BUILDDIR)/
+
+SRCDIRS := $(wildcard $(SRCLIB)*)
+SRCFILES := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
+
+SRCBINDIRS = $(wildcard $(SRCBINLIB)*)
+SRCBINFILES := $(foreach dir,$(SRCBINDIRS),$(wildcard $(dir)/*.c))
+
+SRCTESTDIRS = $(wildcard $(SRCTESTLIB)*)
+SRCTESTFILES := $(foreach dir,$(SRCTESTDIRS),$(wildcard $(dir)/*.c))
 
 # dependencies and objects
-CORE_BUILDEXT = $(BUILD).DEBUG$(DEBUG)
-OBJFILES = $(subst $(CORE_SRCLIB),$(CORE_TMPLIB),$(CORE_SRCFILES:.c=.${CORE_BUILDEXT}.o))
-DEPFILES = $(subst $(CORE_SRCLIB),$(CORE_TMPLIB),$(CORE_SRCFILES:.c=.d))
-SRCBINFILES=$(wildcard $(SRCBINLIB)*.c)
-DEPBINFILES = $(subst $(SRCBINLIB),$(TMPBINLIB),$(SRCBINFILES:.c=.d))
+BUILDEXT = $(BUILD).DEBUG$(DEBUG)
+OBJFILES = $(subst $(SRCLIB),,$(SRCFILES:.c=.${BUILDEXT}.o))
+DEPFILES = $(subst $(SRCLIB),,$(SRCFILES:.c=.d))
+BINFILES = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.${BUILDEXT}))
+DEPBINFILES = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.d))
+TESTFILES = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.${BUILDEXT}))
+DEPTESTFILES = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.d))
 
 # some common build stuff
 MKDIR=mkdir -p
@@ -40,32 +50,51 @@ LBUILD=$(shell echo $(BUILD) | tr A-Z a-z)
 include Makefile.${LBUILD}
 
 ifeq (${DEBUG},1)
-	CORE_CCARGBIN += -g -DDEBUG=${DEBUG}
-	CORE_CCARG += -g  -DDEBUG=${DEBUG}
+	CCARGBIN += -g -DDEBUG=${DEBUG}
+	CCARG += -g  -DDEBUG=${DEBUG}
 else
 	ifeq (${DEBUG},2)
-		CORE_CCARGBIN += -g
-		CORE_CCARG += -g
+		CCARGBIN += -g
+		CCARG += -g
 	else
-		CORE_CCARGBIN += -O1
-		CORE_CCARG += -O1
+		CCARGBIN += -O1
+		CCARG += -O1
 	endif
 endif
 
-include Makefile.rules
+VPATH = $(TMPLIB):$(SRCLIB):$(SRCBINLIV):$(SRCTESTLIB)
 
 include $(DEPFILES)
 include $(DEPBINFILES)
+include $(DEPTESTFILES)
+
+%.${BUILDEXT}.o : %.c
+	@echo "compiling: $<"
+	mkdir -p $(TMPLIB)$(@D)
+	$(CC) $(CCARG) -o $(TMPLIB)$@ $<
+
+%.d: %.c
+	@echo "depending: $<"
+	mkdir -p $(TMPLIB)$(@D)
+	@set -e; rm -f $(TMPLIB)$@; \
+	$(CC) -MM $(CCARGD) $< > $(TMPLIB)$@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $(TMPLIB)$@ : ,g' < $(TMPLIB)$@.$$$$ > $(TMPLIB)$@; \
+	rm -f $(TMPLIB)$@.$$$$
+
+%.${BUILDEXT} : %.c
+	@echo "compiling: $<"
+	mkdir -p $(TMPLIB)$(@D)
+	$(CC) $(CCARGBIN) -o $(TMPLIB)$@ $<
 
 #### various targets
 
 .PHONY: build_error
 build_error: ; $(ERR)
 
-all: build_error depends lib pylib
+all: build_error depends lib bin tests pylib
 
 .PHONY: docs
-docs: build_error
+docs:
 	$(MKDIR) docs
 	doxygen core.doxy
 
@@ -73,15 +102,18 @@ pylib: build_error
 	python src/pylib/setup.py build $(PYLIB_EXT)
 	python src/pylib/setup.py install
 
-clean: build_error
+clean:
 	rm -rf $(BUILDDIR)
-	rm -rf $(BUILDBIN)
 
-depends: build_error $(DEPFILES) $(DEPBINFILES)
+depends: $(DEPFILES) $(DEPBINFILES)
 
-lib: build_error $(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB)
+lib: $(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB)
+
+tests: $(TESTFILES)
+
+bin: $(BINFILES)
 
 $(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB): build_error $(OBJFILES)
 	$(MKDIR) $(BUILDLIB)
-	$(LN) $(LNARG) -o $@ $(OBJFILES) $(LNARG)
+	$(LN) $(LNARG) -o $@ $(addprefix $(TMPLIB), $(OBJFILES)) $(LNARG)
 
