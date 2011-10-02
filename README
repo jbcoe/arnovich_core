@@ -13,11 +13,11 @@ Library for shared common functionality across all Arnovich projects.
 #### HOW TO BUILD ####
 
 To do a clean build go to ./core and do
-sudo make clean all BUILD=<ARCH>
+sudo ./mk clean all BUILD=<ARCH>
 where ARCH=LINUX64/OSX/CYGWIN/MINGW
 
 To do a normal build leave out 'clean'.
 
 To build docs do
-make docs
+./mk docs
 
