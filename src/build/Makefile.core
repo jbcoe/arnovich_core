@@ -26,10 +26,10 @@ TMPLIB=$(BUILDDIR)/
 
 MAKEFILEDIR = $(firstword $(.INCLUDE_DIRS))
 
-SRCDIRS := $(wildcard $(SRCLIB)*)
-SRCFILES := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
+SRCDIRS := $(wildcard $(SRCLIB)*) ./$(SRCLIB)
+SRCFILES := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c)) 
 
-SRCBINDIRS = $(wildcard $(SRCBINLIB)*)
+SRCBINDIRS = $(wildcard $(SRCBINLIB)*) ./$(SRCBINLIB)
 SRCBINFILES := $(foreach dir,$(SRCBINDIRS),$(wildcard $(dir)/*.c))
 
 SRCTESTDIRS = $(wildcard $(SRCTESTLIB)*)
@@ -64,7 +64,7 @@ else
 	endif
 endif
 
-VPATH = $(TMPLIB):$(SRCLIB):$(SRCBINLIV):$(SRCTESTLIB)
+VPATH = $(TMPLIB):$(SRCLIB):$(SRCBINLIB):$(SRCTESTLIB)
 
 include $(DEPFILES)
 include $(DEPBINFILES)
@@ -107,7 +107,7 @@ pylib: build_error
 clean:
 	rm -rf $(BUILDDIR)
 
-depends: $(DEPFILES) $(DEPBINFILES)
+depends: $(DEPFILES) $(DEPBINFILES) $(DEPTESTFILES)
 
 lib: $(BUILDLIB)${PRELIB}${LIBNAME}.$(EXTLIB)
 
