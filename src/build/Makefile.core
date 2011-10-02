@@ -24,6 +24,8 @@ SRCBINLIB=src/bin/
 SRCTESTLIB=test/
 TMPLIB=$(BUILDDIR)/
 
+MAKEFILEDIR = $(firstword $(.INCLUDE_DIRS))
+
 SRCDIRS := $(wildcard $(SRCLIB)*)
 SRCFILES := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c))
 
@@ -96,7 +98,7 @@ all: build_error depends lib bin tests pylib
 .PHONY: docs
 docs:
 	$(MKDIR) docs
-	doxygen core.doxy
+	(cat $(MAKEFILEDIR)/core.doxy; echo "PROJECT_NUMBER=1.0"; echo "PROJECT_NAME=$(LIBNAME)") | doxygen -
 
 pylib: build_error
 	python src/pylib/setup.py build $(PYLIB_EXT)
