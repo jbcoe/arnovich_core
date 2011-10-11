@@ -7,7 +7,6 @@ Library for shared common functionality across all Arnovich projects.
 
 #### TODO ####
 
-- more work on the Matrix
 - add more types to the variant type
 
 #### HOW TO BUILD ####

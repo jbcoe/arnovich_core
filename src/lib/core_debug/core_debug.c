@@ -25,7 +25,8 @@ static char                      core_debug_group_env[DEBUG_GROUP_SET_SIZE][DEBU
 static int                       core_debug_group_set = 0;
 static FILE*                     core_debug_file = NULL;
 
-static int get_core_debug_level_env()
+//static int get_core_debug_level_env()
+int get_core_debug_level_env()
 {
 	if(core_debug_level_env==DEBUG_UNDEFINED)
 	{
@@ -55,7 +56,8 @@ void set_core_debug_group_env(char* group)
     }
 }
 
-static int is_core_debug_group(char* group)
+//static int is_core_debug_group(char* group)
+int is_core_debug_group(char* group)
 {
     if(!core_debug_group_set)
     {
@@ -94,21 +96,21 @@ void unset_core_debug_file()
     }
 }
 
-void debug(int level, char* core_debug_group, char* format, ...)
+void debug(int level, char* core_debug_group, char* format, char* file, int line,...)
 {
     if(get_core_debug_level_env()>=level && 
        (is_core_debug_group(DEBUG_GROUP_ALL) || 
         is_core_debug_group(core_debug_group)))
     {
         va_list vl;
-        va_start(vl, format);
+        va_start(vl, line);
         if(core_debug_file) 
         { 
-            fprintf (core_debug_file, format, __FILE__, __LINE__, vl); 
+            fprintf (core_debug_file, format, file, line, vl); 
         } 
         else 
         { 
-            printf(format, __FILE__, __LINE__, vl); 
+            printf(format, file, line, vl); 
         } 
         va_end(vl);
     };

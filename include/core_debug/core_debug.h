@@ -22,7 +22,7 @@ typedef enum
 void  set_core_debug_level_env(int);
 void  set_core_debug_group_env(char*);
 void  set_core_debug_file(char*);
-void  debug(int,char*,char*,...);
+void  debug(int,char*,char*,char*,int,...);
 
 #define _SET_DEBUG_LEVEL(level) \
 	set_core_debug_level_env(level);
@@ -39,8 +39,24 @@ void  debug(int,char*,char*,...);
 #define _DEBUG_GROUP(group) \
 	static char* core_debug_group = #group;
 
+#include <stdio.h>
+#define DEBUG_GROUP_ALL       "__ALL__"
+int is_core_debug_group(char* group);
+int get_core_debug_level_env();
+
 #define _DEBUG(level, exp, ...) \
-    debug(level, core_debug_group, "%s:%i   "exp"\n", ##__VA_ARGS__);
+{ \
+    if(get_core_debug_level_env()>=level && \
+       (is_core_debug_group(DEBUG_GROUP_ALL) || \
+        is_core_debug_group(core_debug_group))) \
+    { \
+        printf("%s:%i   "exp"\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    }; \
+}
+
+ 
+#define _DEBUG2(level, exp, ...) \
+    debug2(level, core_debug_group, "%s:%i   "exp"\n", __FILE__, __LINE__, ##__VA_ARGS__);
 
 #else
 
