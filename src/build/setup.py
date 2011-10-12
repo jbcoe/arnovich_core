@@ -9,6 +9,8 @@ minorv = None
 isminorv = False
 isfiles = False
 files = []
+isbuilddir = False
+builddir = None
 use_core = False
 use_math = False
 for arg in sys.argv[1:]:
@@ -36,6 +38,12 @@ for arg in sys.argv[1:]:
     elif arg == "--files":
         isfiles = True
         sys.argv.remove(arg)
+    elif arg == "--builddir":
+        isbuilddir = True
+        sys.argv.remove(arg)
+    elif isbuilddir == True:
+        builddir = arg
+        sys.argv.remove(arg)
     elif arg == "--use_core":
         use_core = True
         sys.argv.remove(arg)
@@ -46,7 +54,7 @@ for arg in sys.argv[1:]:
         files.append(arg)
         sys.argv.remove(arg)
 
-if (name == None) or (majorv == None) or (minorv == None):
+if (name == None) or (majorv == None) or (minorv == None) or (builddir == None):
     raise Exception("problem....")
 # if no _ in name then throw
 
@@ -72,7 +80,7 @@ module1 = Extension(shortname,
 setup (name = dotname,
        version = majorv+'.'+minorv,
        author = 'arnovich',
-       package_dir = {'': 'src/pylib'},
+       package_dir = {'': 'build/pylib'},
        packages = ['arnovich'],
        ext_package = 'arnovich',
        ext_modules = [module1])

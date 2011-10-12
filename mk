@@ -1,3 +1,3 @@
 
-./src/build/mk $* LIBNAME=arnovich_core USE_PYTHON=1
+./src/build/mk $* NAME=core USE_PYTHON=1
 

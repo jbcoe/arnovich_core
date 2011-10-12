@@ -1,12 +1,14 @@
 
 # default libname
-ifndef LIBNAME
-	ERROR = "LIBNAME not defined"
+ifndef NAME
+	ERROR = "NAME not defined"
 endif
 	
 ifdef ERROR
 	ERR = $(error BUILD ERROR:  ${ERROR} not defined)
 endif
+
+LIBNAME = arnovich_$(NAME)
 
 BUILD_MAJOR_VERSION ?= 1
 BUILD_MINOR_VERSION ?= 0
@@ -27,6 +29,7 @@ SRCBINLIB=src/bin/
 SRCTESTLIB=test/
 SRCPYLIB=src/pylib/
 TMPLIB=$(BUILDDIR)/
+TMPLIBPY=$(TMPLIB)/pylib/
 
 MAKEFILEDIR = $(firstword $(.INCLUDE_DIRS))
 
@@ -73,7 +76,7 @@ endif
 
 VPATH = $(TMPLIB):$(SRCLIB):$(SRCBINLIB):$(SRCTESTLIB)
 	
-PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_MINOR_VERSION)
+PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_MINOR_VERSION) --builddir $(TMPLIBPY)
 
 #ifdef USE_CORE
 	PYLIB_ARGS += --use_core
@@ -118,6 +121,9 @@ docs:
 	(cat $(MAKEFILEDIR)/core.doxy; echo "PROJECT_NUMBER=$(BUILD_MAJOR_VERSION).$(BUILD_MINOR_VERSION)"; echo "PROJECT_NAME=$(LIBNAME)") | doxygen -
 
 pylib:
+	mkdir -p $(TMPLIBPY)/arnovich/
+	touch $(TMPLIBPY)/arnovich/__init__.py
+	echo '\nfrom arnovich._$(NAME) import *\n' >> $(TMPLIBPY)/arnovich/$(NAME).py
 	python $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --files $(SRCPYFILES)
 	python $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --files $(SRCPYFILES)
 
