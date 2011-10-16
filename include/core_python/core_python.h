@@ -7,6 +7,8 @@
 #define CORE_PYTHON_H_
 
 #include <core_types/core_types_variant.h>
+#include <core_types/core_types_matrix.h>
+
 typedef enum
 {
     CORE_PYTHON_ERROR_SUCCESS = 0,
@@ -19,7 +21,8 @@ variant core_python_py_to_variant(PyObject*);
 
 PyObject* core_python_variant_to_py(variant);
 
-//where is this used?
-CORE_PYTHON_ERROR core_python_py_to_double(PyObject*, double*);
+matrix core_python_py_to_matrix(PyObject*);
+
+PyObject* core_python_matrix_to_py(matrix);
 
 #endif /* CORE_PYTHON_H_ */

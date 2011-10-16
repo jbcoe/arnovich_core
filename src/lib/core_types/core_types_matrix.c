@@ -25,6 +25,22 @@ matrix matrix_copy(matrix m)
     return mm;
 }
 
+void matrix_swap(matrix to, matrix from)
+{
+    if((to.m_width == from.m_width) && 
+       (to.m_height == from.m_height))
+    {
+        int i, j;
+        for(i=0; i<to.m_width; ++i)
+        {
+            for(j=0; j<to.m_height; ++j)
+            {
+                matrix_set(to, j, i, matrix_get(from, j, i)); 
+            }
+        }
+    }
+}
+
 void matrix_free(matrix m)
 {
     m.m_width = 0;

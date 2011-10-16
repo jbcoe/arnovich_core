@@ -4,6 +4,9 @@
  * @brief generic variant type
  */
 
+#ifndef CORE_TYPES_VARIANT_H
+#define CORE_TYPES_VARIANT_H
+
 #define COMPARE_EPSILON 0.000000001
 #define COMPARE_DOUBLE(a,b) (fabs(a-b) < COMPARE_EPSILON)
 
@@ -12,7 +15,8 @@ typedef enum
     CORE_TYPES_VARIANT_INT       = 0,
     CORE_TYPES_VARIANT_DOUBLE    = 1,
     CORE_TYPES_VARIANT_STRING    = 2,
-    CORE_TYPES_VARIANT_MATRIX    = 3
+    CORE_TYPES_VARIANT_MATRIX    = 3,
+    CORE_TYPES_VARIANT_ERROR     = 4
 } CORE_TYPES_VARIANT_TYPE;
 
 
@@ -72,6 +76,8 @@ double variant_as_double(variant v);
 int variant_is_int(variant v);
 
 int variant_is_double(variant v);
+
+#endif
 
 #endif
 

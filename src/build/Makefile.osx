@@ -2,8 +2,10 @@
 # OSX build
 BUILDLIB=/usr/lib/
 BUILDBIN=$(TESTDIR)/bin/
-CC=/usr/bin/g++
-LN=/usr/bin/g++
+CC=/opt/local/bin/g++-mp-4.5
+#CC=/usr/bin/g++-mp-4.5
+LN=/opt/local/bin/g++-mp-4.5
+#LN=/usr/bin/g++-mp-4.5
 CARG= -x c -I include/ -Wall
 LARG =
 EXTLIB=dylib

@@ -22,6 +22,8 @@ matrix matrix_init(unsigned int width, unsigned int height);
 
 matrix matrix_copy(matrix m);
 
+void matrix_swap(matrix to, matrix from);
+
 void matrix_free(matrix m);
 
 int matrix_compare(matrix a, matrix b);
