@@ -35,7 +35,7 @@ void matrix_swap(matrix to, matrix from)
         {
             for(j=0; j<to.m_height; ++j)
             {
-                matrix_set(to, j, i, matrix_get(from, j, i)); 
+                matrix_set(to, i, j, matrix_get(from, i, j)); 
             }
         }
     }
