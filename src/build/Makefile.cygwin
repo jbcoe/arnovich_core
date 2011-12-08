@@ -4,7 +4,7 @@ BUILDLIB=/usr/lib/
 BUILDBIN=$(TESTDIR)/bin/
 CC=/usr/bin/g++
 LN=/usr/bin/g++
-CARG= -x c -I include/ -Wall
+CARG= -I include/ -Wall
 LARG =
 EXTLIB=dll.a
 PYLIB_EXT=
@@ -14,22 +14,27 @@ ifdef USE_PYTHON
 	LARG += -lpython2.7
 endif
 
+ifdef USE_LIBXML
+	CARG += -I /usr/include/libxml2/
+	LARG += -lxml2
+endif
+
 ifdef USE_PTHREAD
 	LARG += -lpthread
 endif
 
 ifdef USE_CORE
-	CARG += -I ../core/include
+	CARG += -I ${ARNOVICHLIB}core/include
 	LARG += -larnovich_core
 endif
 
 ifdef USE_MATH
-	CARG += -I ../math/include
+	CARG += -I ${ARNOVICHLIB}math/include
 	LARG += -larnovich_math
 endif
 
 ifdef USE_BS
-	CARG += -I ../bs/include
+	CARG += -I ${ARNOVICHLIB}bs/include
 	LARG += -larnovich_bs
 endif
 

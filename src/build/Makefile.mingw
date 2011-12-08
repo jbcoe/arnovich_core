@@ -5,8 +5,8 @@ BUILDBIN=$(TESTDIR)\\bin\\
 BUILDLIB=.\\
 CC=gcc
 LN=gcc
-CCARG= -x c -I include/ -I ./ -c -Wall
-CCARGBIN= -x c -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
+CCARG= -I include/ -I ./ -c -Wall
+CCARGBIN= -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
 LNARG=-Wl,-v -shared
 EXTLIB=dll
 PYLIB_EXT=--compiler=mingw32

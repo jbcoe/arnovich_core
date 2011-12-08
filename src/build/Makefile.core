@@ -30,29 +30,40 @@ SRCTESTLIB=test/
 SRCPYLIB=src/pylib/
 TMPLIB=$(BUILDDIR)/
 TMPLIBPY=$(TMPLIB)/pylib/
+ARNOVICHLIB ?= ../
 
 MAKEFILEDIR = $(firstword $(.INCLUDE_DIRS))
 
 SRCDIRS := $(wildcard $(SRCLIB)*) ./$(SRCLIB)
 SRCFILES := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.c)) 
+SRCFILES += $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.cpp)) 
 
 SRCBINDIRS = $(wildcard $(SRCBINLIB)*) ./$(SRCBINLIB)
 SRCBINFILES := $(foreach dir,$(SRCBINDIRS),$(wildcard $(dir)/*.c))
+SRCBINFILES += $(foreach dir,$(SRCBINDIRS),$(wildcard $(dir)/*.cpp))
 
 SRCTESTDIRS = $(wildcard $(SRCTESTLIB)*)
 SRCTESTFILES := $(foreach dir,$(SRCTESTDIRS),$(wildcard $(dir)/*.c))
+SRCTESTFILES += $(foreach dir,$(SRCTESTDIRS),$(wildcard $(dir)/*.cpp))
 
 SRCPYDIRS = $(wildcard $(SRCPYLIB)*) ./$(SRCPYLIB)
 SRCPYFILES := $(foreach dir,$(SRCPYDIRS),$(wildcard $(dir)/*.c))
+SRCPYFILES += $(foreach dir,$(SRCPYDIRS),$(wildcard $(dir)/*.cpp))
 
 # dependencies and objects
 BUILDEXT = $(BUILD).DEBUG$(DEBUG)
-OBJFILES = $(subst $(SRCLIB),,$(SRCFILES:.c=.${BUILDEXT}.o))
-DEPFILES = $(subst $(SRCLIB),,$(SRCFILES:.c=.d))
-BINFILES = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.${BUILDEXT}))
-DEPBINFILES = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.d))
-TESTFILES = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.${BUILDEXT}))
-DEPTESTFILES = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.d))
+OBJFILES_ = $(subst $(SRCLIB),,$(SRCFILES:.c=.${BUILDEXT}.o))
+OBJFILES += $(OBJFILES_:.cpp=.${BUILDEXT}.o)
+DEPFILES_ = $(subst $(SRCLIB),,$(SRCFILES:.c=.d))
+DEPFILES += $(DEPFILES_:.cpp=.d)
+BINFILES_ = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.${BUILDEXT}))
+BINFILES += $(BINFILES_:.cpp=.${BUILDEXT})
+DEPBINFILES_ = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.d))
+DEPBINFILES += $(DEPBINFILES_:.cpp=.d)
+TESTFILES_ = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.${BUILDEXT}))
+TESTFILES += $(TESTFILES_:.cpp=.${BUILDEXT})
+DEPTESTFILES_ = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.d))
+DEPTESTFILES += $(DEPTESTFILES_:.cpp=.d)
 
 # some common build stuff
 MKDIR=mkdir -p
@@ -74,6 +85,12 @@ else
 	endif
 endif
 
+CPPARG = -x c++ ${CCARG}
+CCARG_ += -x c
+
+CPPARGBIN = -x c++ ${CCARGBIN}
+CCARGBIN_ += -x c
+
 VPATH = $(TMPLIB):$(SRCLIB):$(SRCBINLIB):$(SRCTESTLIB)
 	
 PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_MINOR_VERSION) --builddir $(TMPLIBPY)
@@ -93,20 +110,38 @@ PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_
 %.${BUILDEXT}.o : %.c
 	@echo "compiling: $<"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CCARG) -o $(TMPLIB)$@ $<
+	$(CC) $(CCARG_) -o $(TMPLIB)$@ $<
+
+%.${BUILDEXT}.o : %.cpp
+	@echo "compiling: $<"
+	mkdir -p $(TMPLIB)$(@D)
+	$(CC) $(CPPARG) -o $(TMPLIB)$@ $<
 
 %.d: %.c
 	@echo "depending: $<"
 	mkdir -p $(TMPLIB)$(@D)
 	@set -e; rm -f $(TMPLIB)$@; \
-	$(CC) -MM $(CCARGD) $< > $(TMPLIB)$@.$$$$; \
+	$(CC) -MM $(CCARGD_) $< > $(TMPLIB)$@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $(TMPLIB)$@ : ,g' < $(TMPLIB)$@.$$$$ > $(TMPLIB)$@; \
+	rm -f $(TMPLIB)$@.$$$$
+
+%.d: %.cpp
+	@echo "depending: $<"
+	mkdir -p $(TMPLIB)$(@D)
+	@set -e; rm -f $(TMPLIB)$@; \
+	$(CC) -MM $(CPPARGD) $< > $(TMPLIB)$@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $(TMPLIB)$@ : ,g' < $(TMPLIB)$@.$$$$ > $(TMPLIB)$@; \
 	rm -f $(TMPLIB)$@.$$$$
 
 %.${BUILDEXT} : %.c
 	@echo "compiling: $<"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CCARGBIN) -o $(TMPLIB)$@ $<
+	$(CC) $(CCARGBIN_) -o $(TMPLIB)$@ $<
+	
+%.${BUILDEXT} : %.cpp
+	@echo "compiling: $<"
+	mkdir -p $(TMPLIB)$(@D)
+	$(CC) $(CPPARGBIN) -o $(TMPLIB)$@ $<
 
 #### various targets
 
