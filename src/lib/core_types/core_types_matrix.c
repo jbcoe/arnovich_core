@@ -82,21 +82,24 @@ matrix matrix_identity(int n)
 
 char* matrix_to_string(matrix m)
 {
-    static char str[1000];
-    strcpy(str, "[");
+    static char str[10][1000];
+    static int n = 0;
+    ++n;
+    if(n==10) n = 0;
+    strcpy(str[n], "[");
     int i, j;
     for(i=0;i<m.m_height;++i)
     {
-        strcat(str, "[");
+        strcat(str[n], "[");
         for(j=0;j<m.m_width;++j)
         {
-            strcat(str, variant_to_string(matrix_get(m,j,i)));
-            strcat(str, ",");
+            strcat(str[n], variant_to_string(matrix_get(m,j,i)));
+            strcat(str[n], ",");
         }
-        strcat(str, "]");
+        strcat(str[n], "]");
     }
-    strcat(str, "]");
-    return str;
+    strcat(str[n], "]");
+    return str[n];
 }
 
 void matrix_move_rows(matrix m, int row1, int row2)
