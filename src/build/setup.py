@@ -42,6 +42,7 @@ for arg in sys.argv[1:]:
         isbuilddir = True
         sys.argv.remove(arg)
     elif isbuilddir == True:
+        isbuilddir = False
         builddir = arg
         sys.argv.remove(arg)
     elif arg == "--use_core":

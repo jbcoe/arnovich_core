@@ -86,21 +86,21 @@ else
 endif
 
 CPPARG = -x c++ ${CCARG}
-CCARG_ += -x c
+CCARG_ += -x c $(CCARG)
 
 CPPARGBIN = -x c++ ${CCARGBIN}
-CCARGBIN_ += -x c
+CCARGBIN_ += -x c $(CCARGBIN)
 
 VPATH = $(TMPLIB):$(SRCLIB):$(SRCBINLIB):$(SRCTESTLIB)
 	
 PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_MINOR_VERSION) --builddir $(TMPLIBPY)
 
 #ifdef USE_CORE
-	PYLIB_ARGS += --use_core
+	#PYLIB_ARGS += --use_core
 #endif
 
 #ifdef USE_MATH
-	PYLIB_ARGS += --use_math
+	#PYLIB_ARGS += --use_math
 #endif
 
 # include $(DEPFILES)
@@ -159,8 +159,8 @@ pylib:
 	mkdir -p $(TMPLIBPY)/arnovich/
 	touch $(TMPLIBPY)/arnovich/__init__.py
 	echo '\nfrom arnovich._$(NAME) import *\n' >> $(TMPLIBPY)/arnovich/$(NAME).py
-	python $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --files $(SRCPYFILES)
-	python $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --files $(SRCPYFILES)
+	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --files $(SRCPYFILES)
+	$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --files $(SRCPYFILES)
 
 clean:
 	rm -rf $(BUILDDIR)

@@ -35,6 +35,18 @@ variant core_python_py_to_variant(PyObject* o)
             }
         }
     }
+    if(PyString_Check(o))
+    {
+        char *s = PyString_AsString(o);
+        if(s)
+        {
+            return variant_from_string(s);
+        }
+    }
+    if(PyList_Check(o))
+    {
+        return variant_from_matrix(core_python_py_to_matrix(o));
+    }
     return VARIANT_NIL;
 }
 
@@ -47,6 +59,18 @@ PyObject* core_python_variant_to_py(variant v)
     if(variant_is_double(v))
     {
         return PyFloat_FromDouble(variant_as_double(v));
+    }
+    if(variant_is_string(v))
+    {
+        return PyString_FromString(variant_as_string(v));
+    }
+    if(variant_is_matrix(v))
+    {
+        return core_python_matrix_to_py(variant_as_matrix(v));
+    }
+    if(variant_is_empty(v))
+    {
+        Py_RETURN_TRUE;
     }
     return NULL;
 }

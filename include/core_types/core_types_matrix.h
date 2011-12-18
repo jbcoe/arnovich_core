@@ -4,17 +4,26 @@
  * @brief simple two_dimensional matrix
  */
 
-#ifndef CORE_TYPES_MATRIX_H
-#define CORE_TYPES_MATRIX_H
+#ifndef CORE_TYPES_MATRIX_STRUCT_H
+#define CORE_TYPES_MATRIX_STRUCT_H
 
-#include <core_types/core_types_variant.h>
+struct core_types_variant;
 
 typedef struct core_types_matrix
 {
-    variant* m_values;
+    struct core_types_variant* m_values;
     unsigned int m_width;  //x-dimension
     unsigned int m_height; //y-dimension
 } matrix;
+
+#endif
+
+#include <core_types/core_types_variant.h>
+
+#ifndef CORE_TYPES_MATRIX_ONLY_STRUCT
+
+#ifndef CORE_TYPES_MATRIX_H
+#define CORE_TYPES_MATRIX_H
 
 #define MATRIX_USE_MACROS
 
@@ -61,6 +70,8 @@ void matrix_replace_row(matrix a, int row1, matrix b, int row2);
 variant matrix_get(matrix m, unsigned int i, unsigned int j);
 
 void matrix_set(matrix m, unsigned int i, unsigned int j, variant v);
+
+#endif
 
 #endif
 

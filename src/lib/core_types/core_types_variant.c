@@ -6,9 +6,30 @@
 
 #include <core_types/core_types_variant.h>
 
+#include <core_types/core_types_matrix.h>
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+void variant_free(variant v)
+{
+    switch(v.m_type)
+    {
+    case CORE_TYPES_VARIANT_INT:
+    case CORE_TYPES_VARIANT_DOUBLE:
+        break;
+    case CORE_TYPES_VARIANT_STRING:
+    case CORE_TYPES_VARIANT_ERROR:
+        free(v.m_v.m_s.m_s);
+        break;
+    case CORE_TYPES_VARIANT_MATRIX:
+        matrix_free(v.m_v.m_m);
+    default:
+        break;
+    }
+}
 
 char* variant_to_string(variant v)
 {
@@ -21,6 +42,14 @@ char* variant_to_string(variant v)
     case CORE_TYPES_VARIANT_DOUBLE:
         sprintf(str, "%f", v.m_v.m_d);
         break;
+    case CORE_TYPES_VARIANT_STRING:
+        sprintf(str, "%s", v.m_v.m_s.m_s);
+        break;
+    case CORE_TYPES_VARIANT_ERROR:
+        sprintf(str, "#ERROR: %s", v.m_v.m_s.m_s);
+        break;
+    case CORE_TYPES_VARIANT_MATRIX:
+        return matrix_to_string(v.m_v.m_m);
     default:
         strcpy(str, "");
         break;
@@ -54,10 +83,92 @@ int variant_equal(variant a, variant b)
             break;
         }
         break;
+    case CORE_TYPES_VARIANT_STRING:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_STRING:
+            return (strcmp(a.m_v.m_s.m_s, b.m_v.m_s.m_s) == 0);
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_ERROR:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_ERROR:
+            return (strcmp(a.m_v.m_s.m_s, b.m_v.m_s.m_s) == 0);
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_MATRIX:
+        switch(b.m_type)
+        {
+            case CORE_TYPES_VARIANT_MATRIX:
+                return matrix_compare(a.m_v.m_m, b.m_v.m_m);
+            default:
+                break;
+        }
+        break;
     default:
         break;
     }
     return 0;
+}
+
+variant variant_from_string(char *c)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_STRING;
+    v.m_v.m_s.m_l = strlen(c);
+    v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*v.m_v.m_s.m_l); 
+    strcpy(v.m_v.m_s.m_s, c);
+    return v;
+}
+
+variant variant_from_error(char *c)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_ERROR;
+    v.m_v.m_s.m_l = strlen(c);
+    v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*v.m_v.m_s.m_l); 
+    strcpy(v.m_v.m_s.m_s, c);
+    return v;
+}
+
+variant variant_from_matrix(matrix m)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_MATRIX;
+    v.m_v.m_m = matrix_copy(m);
+    return v;
+}
+
+char* variant_as_string(variant v)
+{
+    if(CORE_TYPES_VARIANT_STRING == v.m_type)
+    {
+        return v.m_v.m_s.m_s;
+    }
+    return "";
+}
+
+char* variant_as_error(variant v)
+{
+    if(CORE_TYPES_VARIANT_ERROR == v.m_type)
+    {
+        return variant_to_string(v);
+    }
+    return "";
+}
+
+matrix variant_as_matrix(variant v)
+{
+    if(CORE_TYPES_VARIANT_MATRIX == v.m_type)
+    {
+        return v.m_v.m_m;
+    }
+    return MATRIX_IDENTITY(0);
 }
 
 #ifndef VARIANT_USE_MACROS
@@ -104,6 +215,11 @@ double variant_as_double(variant v)
     return 0.0;
 }
 
+int variant_is_empty(variant v)
+{
+    return (CORE_TYPES_VARIANT_EMPTY == v.m_type);
+}
+
 int variant_is_int(variant v)
 {
     return (CORE_TYPES_VARIANT_INT == v.m_type);
@@ -112,6 +228,21 @@ int variant_is_int(variant v)
 int variant_is_double(variant v)
 {
     return (CORE_TYPES_VARIANT_DOUBLE == v.m_type);
+}
+
+int variant_is_string(variant v)
+{
+    return (CORE_TYPES_VARIANT_STRING == v.m_type);
+}
+
+int variant_is_error(variant v)
+{
+    return (CORE_TYPES_VARIANT_ERROR == v.m_type);
+}
+
+int variant_is_matrix(variant v)
+{
+    return (CORE_TYPES_VARIANT_MATRIX == v.m_type);
 }
 
 #endif

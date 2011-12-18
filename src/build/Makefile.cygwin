@@ -4,6 +4,7 @@ BUILDLIB=/usr/lib/
 BUILDBIN=$(TESTDIR)/bin/
 CC=/usr/bin/g++
 LN=/usr/bin/g++
+PYTHON=/usr/bin/python
 CARG= -I include/ -Wall
 LARG =
 EXTLIB=dll.a

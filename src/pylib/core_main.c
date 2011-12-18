@@ -2,84 +2,37 @@
  * @file core_main.c
  */
 
-#include <Python.h>
-
 #define DEBUG
+
+#include <core_python/core_python_wrap.h>
 
 #include <core_debug/core_debug.h>
 
-static PyObject *CoreError;
-
-void core_setaterror(const char * msg)
+variant set_level(variant i)
 {
-	PyErr_SetString(CoreError, msg);
-}
-
-
-PyObject* Core_set_level(PyObject *self, PyObject *args, PyObject *kwds)
-{
-	int level;
-
-    if(!PyArg_ParseTuple(args, "i", &level))
+    if(!variant_is_int(i))
     {
-    	core_setaterror("Invalid debug level input");
-        return NULL;
+        return variant_from_error("Invalid debug level");
     }
-
-    _SET_DEBUG_LEVEL(level);
-
-    Py_RETURN_TRUE;
+    _SET_DEBUG_LEVEL(variant_as_int(i));
+    return VARIANT_EMPTY;
 }
 
-PyObject* Core_set_group(PyObject *self, PyObject *args, PyObject *kwds)
+variant set_group(variant s)
 {
-	char* group;
-
-    if(!PyArg_ParseTuple(args, "s", &group))
+    if(variant_is_string(s))
     {
-    	core_setaterror("Invalid debug group input");
-        return NULL;
+        return variant_from_error("Invalid debug group");
     }
-
-    _SET_DEBUG_GROUP(group);
-
-    Py_RETURN_TRUE;
+    _SET_DEBUG_GROUP(variant_as_string(s));
+    return VARIANT_EMPTY;
 }
 
-static PyMethodDef CoreMethods[] = {
-	{"set_debug_level", (PyCFunction)Core_set_level, METH_VARARGS,
-     "set_debug_level(level)\n\n Set debug level"
-	},
-	{"set_debug_group", (PyCFunction)Core_set_group, METH_VARARGS,
-     "set_debug_group(group)\n\n Set debug group"
-	},
-	{NULL, NULL, 0, NULL}
-};
+DEFINE_PY_FUNCTION(set_debug_level, set_level, 1, desc)
+DEFINE_PY_FUNCTION(set_debug_group, set_group, 1, desc)
 
-PyMODINIT_FUNC init_core(void)
-{
-    PyObject* m;
+START_PY_MODULE(core, Module for Arnovich Core)
+    ADD_PY_FUNCTION(set_debug_level)
+    ADD_PY_FUNCTION(set_debug_group)
+END_PY_MODULE
 
-    m = Py_InitModule3(
-    		"arnovich._core",
-    		CoreMethods,
-    		"Module for Core");
-
-    if (m == NULL)
-      return;
-
-    CoreError = PyErr_NewException("Core.error", PyExc_StandardError, NULL);
-    Py_INCREF(CoreError);
-    PyModule_AddObject(m, "Core error", CoreError);
-
-}
-
-int main(int argc, char *argv[])
-{
-    Py_SetProgramName(argv[0]);
-
-    Py_Initialize();
-
-    init_core();
-    return 0;
-}

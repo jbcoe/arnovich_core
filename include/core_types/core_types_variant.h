@@ -7,16 +7,21 @@
 #ifndef CORE_TYPES_VARIANT_H
 #define CORE_TYPES_VARIANT_H
 
+#define CORE_TYPES_MATRIX_ONLY_STRUCT
+#include <core_types/core_types_matrix.h>
+#undef CORE_TYPES_MATRIX_ONLY_STRUCT
+
 #define COMPARE_EPSILON 0.000000001
 #define COMPARE_DOUBLE(a,b) (fabs(a-b) < COMPARE_EPSILON)
 
 typedef enum
 {
-    CORE_TYPES_VARIANT_INT       = 0,
-    CORE_TYPES_VARIANT_DOUBLE    = 1,
-    CORE_TYPES_VARIANT_STRING    = 2,
-    CORE_TYPES_VARIANT_MATRIX    = 3,
-    CORE_TYPES_VARIANT_ERROR     = 4
+    CORE_TYPES_VARIANT_EMPTY     = 0,
+    CORE_TYPES_VARIANT_INT       = 1,
+    CORE_TYPES_VARIANT_DOUBLE    = 2,
+    CORE_TYPES_VARIANT_STRING    = 3,
+    CORE_TYPES_VARIANT_MATRIX    = 4,
+    CORE_TYPES_VARIANT_ERROR     = 5
 } CORE_TYPES_VARIANT_TYPE;
 
 
@@ -26,16 +31,24 @@ typedef enum
 //TODO then to_python returns a NULL plus sets the string value as an exception
 //TODO so in the python layer just do return to_python(result)
 //TODO then we can easily generate python wrappers for functions taking only variants as arguments
+
 struct core_types_variant
 {
     CORE_TYPES_VARIANT_TYPE m_type;
     union
     {
-        int      m_i;
-        double   m_d;
+        int                              m_i;
+        double                           m_d;
+        struct { char *m_s; int m_l; }   m_s;
+        matrix                           m_m;
     } m_v;
 };
 typedef struct core_types_variant variant;
+
+/*
+ * only needs to be called for matrix and string variants
+ */
+void variant_free(variant v);
 
 /*
  * @brief Returns a string representation of a variant
@@ -45,7 +58,20 @@ char* variant_to_string(variant v);
 
 int variant_equal(variant a, variant b);
 
-#define VARIANT_NIL (variant){CORE_TYPES_VARIANT_INT, {.m_i=0} };
+#define VARIANT_EMPTY (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
+#define VARIANT_NIL (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
+
+variant variant_from_string(char* c);
+
+variant variant_from_error(char* c);
+
+variant variant_from_matrix(matrix m);
+
+char* variant_as_string(variant v);
+
+char* variant_as_error(variant v);
+
+matrix variant_as_matrix(variant v);
 
 #define VARIANT_USE_MACROS
 
@@ -59,9 +85,17 @@ int variant_equal(variant a, variant b);
 
 #define variant_as_double(v) ((CORE_TYPES_VARIANT_DOUBLE == v.m_type)?v.m_v.m_d:((CORE_TYPES_VARIANT_INT == v.m_type)?((double)v.m_v.m_i):0.0))
 
+#define variant_is_empty(v) (CORE_TYPES_VARIANT_EMPTY == v.m_type)
+
 #define variant_is_int(v) (CORE_TYPES_VARIANT_INT == v.m_type)
 
 #define variant_is_double(v) (CORE_TYPES_VARIANT_DOUBLE == v.m_type)
+
+#define variant_is_string(v) (CORE_TYPES_VARIANT_STRING == v.m_type)
+
+#define variant_is_error(v) (CORE_TYPES_VARIANT_ERROR == v.m_type)
+
+#define variant_is_matrix(v) (CORE_TYPES_VARIANT_MATRIX == v.m_type)
 
 #else
 
@@ -73,9 +107,17 @@ int variant_as_int(variant v);
 
 double variant_as_double(variant v);
 
+int variant_is_empty(variant v);
+
 int variant_is_int(variant v);
 
 int variant_is_double(variant v);
+
+int variant_is_string(variant v);
+
+int variant_is_error(variant v);
+
+int variant_is_matrix(variant v);
 
 #endif
 
