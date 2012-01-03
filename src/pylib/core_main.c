@@ -34,5 +34,6 @@ DEFINE_PY_FUNCTION(set_debug_group, set_group, 1, desc)
 START_PY_MODULE(core, Module for Arnovich Core)
     ADD_PY_FUNCTION(set_debug_level)
     ADD_PY_FUNCTION(set_debug_group)
+    ADD_PY_EXCEPTION(CoreError)
 END_PY_MODULE
 

@@ -9,7 +9,7 @@ typedef variant (*wrapped_function4)(variant, variant, variant, variant);
 typedef variant (*wrapped_function5)(variant, variant, variant, variant, variant);
 
 // simple function with no python state 
-PyObject* python_wrap_function(PyObject* self, PyObject* args, int nargs, void* function)
+PyObject* python_wrap_function(PyObject* args, int nargs, void* function)
 {
     if(PyTuple_Size(args) != nargs)
     {

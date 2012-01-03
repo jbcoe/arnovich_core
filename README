@@ -8,12 +8,9 @@ Library for shared common functionality across all Arnovich projects.
 #### TODO ####
 
 - fix debug call: should move out of header
-- add more types to the variant type
-  - variant should also be matrix
-  - variant should also be error
-  - add static/macro variant_ok error
+- add static/macro variant_ok error
 - serialisation of variant type(to_/from_string)
-- python wrapper macros
+- python wrapper macros: for python objects/types
 
 #### HOW TO BUILD ####
 

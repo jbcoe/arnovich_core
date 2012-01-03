@@ -11,13 +11,18 @@
 
 namespace CVariant
 {
-#include <core_types/core_types_variant.h>
+
+extern "C"
+{
+    #include <core_types/core_types_variant.h>
+}
+
 }
 
 class variant
 {
 public:
-    variant() : m_v()
+    variant() : m_v(VARIANT_EMPTY)
     {
         m_count = new int;
         *m_count = 1;
