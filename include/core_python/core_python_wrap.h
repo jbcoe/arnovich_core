@@ -6,17 +6,19 @@
 #include <core_python/core_python.h>
 
 // simple function with no python state 
-PyObject* python_wrap_function(PyObject* args, int nargs, void* function);
+typedef int (*py_error_function)(char* name, char* msg);
+PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_error_function err, void *self);
 
-//TODO PY_EXCEPTION construct is crashing
 //TODO PY_Object adder is not handling self-referential functions
 //TODO for now: if self=NULL in funciton-wrapper then cast data-member to void* and pass as first 
+//probably need to add another DEFINE_PY_FUNCTION
 //argument to wrapped function
 
 #define DEFINE_PY_FUNCTION(NAME, FUNCTION, NARGS, DESCRIPTION) \
+	static py_error_function NAME##_error = NULL; \
     static PyObject* PyFunc_##NAME(PyObject* self, PyObject* args) \
     { \
-        return python_wrap_function(args, NARGS, FUNCTION); \
+        return python_wrap_function(args, NARGS, FUNCTION, NAME##_error, NULL); \
     }\
     static char NAME##_name[] = #NAME; \
     static char NAME##_description[] = #DESCRIPTION;
@@ -142,7 +144,7 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function);
         free(m); \
         NAME##_nobjects = NAME##_nobjects + 1; \
     } \
-    void NAME##_error(char* name, char* msg) \
+    int NAME##_error(char* name, char* msg) \
     { \
         int i = 0;\
         for(;i<NAME##_nobjects;++i) \
@@ -150,27 +152,36 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function);
             if(strcmp(name, NAME##_objects[i].m_name) == 0) \
             { \
                 PyErr_SetString((PyObject*)NAME##_objects[i].m_type, msg); \
+				return 1; \
             } \
         } \
+		return 0; \
     } \
     PyMODINIT_FUNC init_##NAME(void) \
     { \
         Py_AtExit(NAME##_at_exit); \
         Py_add_method(NULL, NULL, 0, NULL); \
         char* name = "arnovich._"#NAME; \
+        char* expname = "arnovich."#NAME; \
         char* description = #DESCRIPTION; \
         struct PyObjects **objects = &NAME##_objects; \
         size_t *nobjects = &NAME##_nobjects; \
         PyMethodDef **methods = &NAME##_methods; \
+		py_error_function error_func = NAME##_error;
 
 #define ADD_PY_FUNCTION(NAME) \
-    Py_add_method(NAME##_name,  PyFunc_##NAME, METH_VARARGS, NAME##_description);
+		NAME##_error = error_func; \
+		Py_add_method(NAME##_name,  PyFunc_##NAME, METH_VARARGS, NAME##_description);
 
 #define ADD_PY_EXCEPTION(NAME) \
-    Py_add_object(#NAME, (PyTypeObject*)PyErr_NewException(#NAME, PyExc_StandardError, NULL));
+		char *exp_##NAME = (char*)malloc(strlen(name)+strlen(#NAME)+2); \
+		strcpy(exp_##NAME, expname); \
+		strcat(exp_##NAME, "."#NAME); \
+		Py_add_object(#NAME, (PyTypeObject*)PyErr_NewException(exp_##NAME, PyExc_StandardError, NULL)); \
+		free(exp_##NAME);
 
 #define ADD_PY_OBJECT(NAME) \
-    Py_add_object(#NAME, NAME##_type());
+		Py_add_object(#NAME, NAME##_type());
 
 #define END_PY_MODULE \
         PyObject *module = Py_InitModule3(name, *methods, description); \

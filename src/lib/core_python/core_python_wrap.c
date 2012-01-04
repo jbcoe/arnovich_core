@@ -8,8 +8,37 @@ typedef variant (*wrapped_function3)(variant, variant, variant);
 typedef variant (*wrapped_function4)(variant, variant, variant, variant);
 typedef variant (*wrapped_function5)(variant, variant, variant, variant, variant);
 
+static char* variant_error_type(char* str)
+{
+	static char rtn[50];
+	char* p = strtok(str, ": ");
+	if(p)
+	{
+		strcpy(rtn, p);
+		return rtn;
+	}
+	return "";
+}
+
+static char* variant_error_msg(char* str)
+{
+	static char rtn[50];
+	char* p = strtok(str, ":");
+	if(p)
+	{
+		p = strtok(NULL, ":");
+		if(p)
+		{
+			size_t i = strspn(p, " ");
+			strcpy(rtn, p+i);
+			return rtn;
+		}
+	}
+	return "";
+}
+
 // simple function with no python state 
-PyObject* python_wrap_function(PyObject* args, int nargs, void* function)
+PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_error_function err, void *self)
 {
     if(PyTuple_Size(args) != nargs)
     {
@@ -73,8 +102,12 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function)
 
     if(variant_is_error(rtn))
     {
-        PyErr_SetString(PyExc_StandardError, variant_as_error(rtn));
-        return NULL;
+		char *str = variant_as_error(rtn);
+		if(!err || !err(variant_error_type(str), variant_error_msg(str)))
+		{
+			PyErr_SetString(PyExc_StandardError, variant_as_error(rtn));
+		}
+		return NULL;
     }
     
     return core_python_variant_to_py(rtn);

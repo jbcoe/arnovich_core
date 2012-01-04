@@ -15,6 +15,7 @@ variant set_level(variant i)
         return variant_from_error("Invalid debug level");
     }
     _SET_DEBUG_LEVEL(variant_as_int(i));
+	//return variant_from_error("CoreError :   hey hey");
     return VARIANT_EMPTY;
 }
 
