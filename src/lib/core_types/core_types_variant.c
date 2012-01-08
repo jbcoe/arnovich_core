@@ -215,6 +215,19 @@ double variant_as_double(variant v)
     return 0.0;
 }
 
+variant VARIANT_EMPTY()
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_EMPTY;
+    v.m_v.m_i = 0;
+    return v;
+}
+
+variant VARIANT_NIL()
+{
+    return VARIANT_EMPTY();
+}
+
 int variant_is_empty(variant v)
 {
     return (CORE_TYPES_VARIANT_EMPTY == v.m_type);

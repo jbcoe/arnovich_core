@@ -22,7 +22,7 @@ extern "C"
 class variant
 {
 public:
-    variant() : m_v(VARIANT_EMPTY)
+    variant() : m_v(CVariant::VARIANT_EMPTY())
     {
         m_count = new int;
         *m_count = 1;
@@ -38,6 +38,7 @@ public:
         m_count = v.m_count;
         m_v = v.m_v;
         ++(*m_count);
+        return *this;
     }
     ~variant()
     {
@@ -58,11 +59,11 @@ public:
     {
     }
     
-    variant(const std::string& s) : m_v(CVariant::variant_from_string(s.c_str()))
+    variant(const std::string& s) : m_v(CVariant::variant_from_string(const_cast<char*>(s.c_str())))
     {
     }
     
-    variant(matrix m) : m_v(CVariant::variant_from_matrix(m))
+    variant(CVariant::matrix m) : m_v(CVariant::variant_from_matrix(m))
     {
     }
 
@@ -81,7 +82,7 @@ public:
         return CVariant::variant_as_string(m_v);
     }
 
-    operator matrix() const
+    operator CVariant::matrix() const
     {
         return CVariant::variant_as_matrix(m_v);
     }
@@ -111,7 +112,7 @@ public:
         return CVariant::variant_is_matrix(m_v);
     }
 
-    operator ==(const variant& v) const
+    bool operator ==(const variant& v) const
     {
         return variant_equal(m_v, v.m_v);
     }

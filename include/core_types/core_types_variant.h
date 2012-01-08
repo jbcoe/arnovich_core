@@ -58,8 +58,6 @@ char* variant_to_string(variant v);
 
 int variant_equal(variant a, variant b);
 
-#define VARIANT_EMPTY (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
-#define VARIANT_NIL (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
 
 variant variant_from_string(char* c);
 
@@ -73,9 +71,14 @@ char* variant_as_error(variant v);
 
 matrix variant_as_matrix(variant v);
 
+#ifndef __cplusplus
 #define VARIANT_USE_MACROS
+#endif
 
 #ifdef VARIANT_USE_MACROS
+
+#define VARIANT_EMPTY (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
+#define VARIANT_NIL (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
 
 #define variant_from_int(i) (variant){CORE_TYPES_VARIANT_INT, {.m_i=i}}
 
@@ -98,6 +101,9 @@ matrix variant_as_matrix(variant v);
 #define variant_is_matrix(v) (CORE_TYPES_VARIANT_MATRIX == v.m_type)
 
 #else
+
+variant VARIANT_EMPTY();
+variant VARIANT_NIL();
 
 variant variant_from_double(double d);
 
