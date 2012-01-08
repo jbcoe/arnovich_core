@@ -157,7 +157,8 @@ char* variant_as_error(variant v)
 {
     if(CORE_TYPES_VARIANT_ERROR == v.m_type)
     {
-        return variant_to_string(v);
+        return v.m_v.m_s.m_s;
+        //return variant_to_string(v);
     }
     return "";
 }
