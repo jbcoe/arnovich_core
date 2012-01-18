@@ -102,28 +102,41 @@ matrix variant_as_matrix(variant v);
 
 #else
 
-variant VARIANT_EMPTY();
-variant VARIANT_NIL();
+variant _variant_empty();
+#define VARIANT_EMPTY() _variant_empty()
 
-variant variant_from_double(double d);
+variant _variant_nil();
+#define VARIANT_NIL() _variant_nil()
 
-variant variant_from_int(int i);
+variant _variant_from_double(double d);
+#define variant_from_double(d) _variant_from_double(d)
 
-int variant_as_int(variant v);
+variant _variant_from_int(double d);
+#define variant_from_int(d) _variant_from_int(d)
 
-double variant_as_double(variant v);
+int _variant_as_int(variant v);
+#define variant_as_int(v) _variant_as_int(v)
 
-int variant_is_empty(variant v);
+double _variant_as_double(variant v);
+#define variant_as_double(v) _variant_as_double(v)
 
-int variant_is_int(variant v);
+int _variant_is_empty(variant v);
+#define variant_is_empty(v) _variant_is_empty(v)
 
-int variant_is_double(variant v);
+int _variant_is_int(variant v);
+#define variant_is_int(v) _variant_is_int(v)
 
-int variant_is_string(variant v);
+int _variant_is_double(variant v);
+#define variant_is_double(v) _variant_is_double(v)
 
-int variant_is_error(variant v);
+int _variant_is_string(variant v);
+#define variant_is_string(v) _variant_is_string(v)
 
-int variant_is_matrix(variant v);
+int _variant_is_error(variant v);
+#define variant_is_error(v) _variant_is_error(v)
+
+int _variant_is_matrix(variant v);
+#define variant_is_matrix(v) _variant_is_matrix(v)
 
 #endif
 

@@ -116,6 +116,22 @@ int variant_equal(variant a, variant b)
     return 0;
 }
 
+variant _variant_from_double(double d)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_DOUBLE;
+    v.m_v.m_d = d;
+    return v;
+}
+
+variant _variant_from_int(int i)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_INT;
+    v.m_v.m_i = i;
+    return v;
+}
+
 variant variant_from_string(char *c)
 {
     variant v;
@@ -172,25 +188,7 @@ matrix variant_as_matrix(variant v)
     return MATRIX_IDENTITY(0);
 }
 
-#ifndef VARIANT_USE_MACROS
-
-variant variant_from_double(double d)
-{
-    variant v;
-    v.m_type = CORE_TYPES_VARIANT_DOUBLE;
-    v.m_v.m_d = d;
-    return v;
-}
-
-variant variant_from_int(int i)
-{
-    variant v;
-    v.m_type = CORE_TYPES_VARIANT_INT;
-    v.m_v.m_i = i;
-    return v;
-}
-
-int variant_as_int(variant v)
+int _variant_as_int(variant v)
 {
     if(CORE_TYPES_VARIANT_INT == v.m_type)
     {
@@ -203,7 +201,7 @@ int variant_as_int(variant v)
     return 0;
 }
 
-double variant_as_double(variant v)
+double _variant_as_double(variant v)
 {
     if(CORE_TYPES_VARIANT_DOUBLE == v.m_type)
     {
@@ -216,7 +214,7 @@ double variant_as_double(variant v)
     return 0.0;
 }
 
-variant VARIANT_EMPTY()
+variant _variant_empty()
 {
     variant v;
     v.m_type = CORE_TYPES_VARIANT_EMPTY;
@@ -224,40 +222,38 @@ variant VARIANT_EMPTY()
     return v;
 }
 
-variant VARIANT_NIL()
+variant _variant_nil()
 {
-    return VARIANT_EMPTY();
+    return _variant_empty();
 }
 
-int variant_is_empty(variant v)
+int _variant_is_empty(variant v)
 {
     return (CORE_TYPES_VARIANT_EMPTY == v.m_type);
 }
 
-int variant_is_int(variant v)
+int _variant_is_int(variant v)
 {
     return (CORE_TYPES_VARIANT_INT == v.m_type);
 }
 
-int variant_is_double(variant v)
+int _variant_is_double(variant v)
 {
     return (CORE_TYPES_VARIANT_DOUBLE == v.m_type);
 }
 
-int variant_is_string(variant v)
+int _variant_is_string(variant v)
 {
     return (CORE_TYPES_VARIANT_STRING == v.m_type);
 }
 
-int variant_is_error(variant v)
+int _variant_is_error(variant v)
 {
     return (CORE_TYPES_VARIANT_ERROR == v.m_type);
 }
 
-int variant_is_matrix(variant v)
+int _variant_is_matrix(variant v)
 {
     return (CORE_TYPES_VARIANT_MATRIX == v.m_type);
 }
-
-#endif
 

@@ -19,6 +19,10 @@ typedef enum
 
 #ifdef DEBUG
 
+#ifndef CASTOP
+#define CASTOP(op) op
+#endif
+
 void  set_core_debug_level_env(int);
 void  set_core_debug_group_env(char*);
 void  set_core_debug_file(char*);
@@ -37,7 +41,7 @@ void  debug(int,char*,char*,char*,int,...);
 	unset_core_debug_file();
 
 #define _DEBUG_GROUP(group) \
-	static char* core_debug_group = #group;
+	static char* core_debug_group = CASTOP(#group);
 
 #include <stdio.h>
 #define DEBUG_GROUP_ALL       "__ALL__"
