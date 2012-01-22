@@ -31,6 +31,26 @@ void variant_free(variant v)
     }
 }
 
+variant variant_copy(variant v)
+{
+    variant rtn = v;
+    switch(v.m_type)
+    {
+    case CORE_TYPES_VARIANT_INT:
+    case CORE_TYPES_VARIANT_DOUBLE:
+        break;
+    case CORE_TYPES_VARIANT_STRING:
+    case CORE_TYPES_VARIANT_ERROR:
+        strcpy(rtn.m_v.m_s.m_s, v.m_v.m_s.m_s);
+        break;
+    case CORE_TYPES_VARIANT_MATRIX:
+        rtn.m_v.m_m = matrix_copy(v.m_v.m_m);
+    default:
+        break;
+    }
+    return rtn;
+}
+
 char* variant_to_string(variant v)
 {
     static char str[50];

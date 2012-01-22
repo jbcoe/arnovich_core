@@ -151,9 +151,7 @@ void matrix_replace_row(matrix a, int row1, matrix b, int row2)
     }
 }
 
-#ifndef MATRIX_USE_MACROS
-
-variant matrix_get(matrix m, unsigned int i, unsigned int j)
+variant _matrix_get(matrix m, unsigned int i, unsigned int j)
 {
     if((i < m.m_width) && (j < m.m_height))
     {
@@ -162,13 +160,11 @@ variant matrix_get(matrix m, unsigned int i, unsigned int j)
     return VARIANT_NIL;
 }
 
-void matrix_set(matrix m, unsigned int i, unsigned int j, variant v)
+void _matrix_set(matrix m, unsigned int i, unsigned int j, variant v)
 {
     if((i < m.m_width) && (j < m.m_height))
     {
         m.m_values[j*m.m_width+i] = v;
     }
 }
-
-#endif
 

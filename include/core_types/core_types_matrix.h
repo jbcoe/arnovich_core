@@ -25,8 +25,6 @@ typedef struct core_types_matrix
 #ifndef CORE_TYPES_MATRIX_H
 #define CORE_TYPES_MATRIX_H
 
-#define MATRIX_USE_MACROS
-
 matrix matrix_init(unsigned int width, unsigned int height);
 
 matrix matrix_copy(matrix m);
@@ -38,8 +36,6 @@ void matrix_free(matrix m);
 int matrix_compare(matrix a, matrix b);
 
 matrix matrix_identity(int n);
-
-#define MATRIX_IDENTITY(N) matrix_identity(N)
 
 /*
  * @brief Returns a string representation of the matrix.
@@ -55,6 +51,12 @@ matrix matrix_get_row(matrix m, int row);
 
 void matrix_replace_row(matrix a, int row1, matrix b, int row2);
 
+#define MATRIX_IDENTITY(N) matrix_identity(N)
+
+#ifndef __cplusplus
+#define MATRIX_USE_MACROS
+#endif
+
 #ifdef MATRIX_USE_MACROS
 
 #define matrix_get_safe(m,i,j) (((i < (m).m_width) && (j < (m).m_height))?(m).m_values[(j)*m.m_width+i]:VARIANT_NIL)
@@ -67,9 +69,13 @@ void matrix_replace_row(matrix a, int row1, matrix b, int row2);
 
 #else
 
-variant matrix_get(matrix m, unsigned int i, unsigned int j);
+variant _matrix_get(matrix m, unsigned int i, unsigned int j);
+#define matrix_get(m, i, j) _matrix_get(m, i, j)
+#define matrix_get_safe(m, i, j) _matrix_get(m, i, j)
 
-void matrix_set(matrix m, unsigned int i, unsigned int j, variant v);
+void _matrix_set(matrix m, unsigned int i, unsigned int j, variant v);
+#define matrix_set(m, i, j, v) _matrix_set(m, i, j, v)
+#define matrix_set_safe(m, i, j, v) _matrix_set(m, i, j, v)
 
 #endif
 

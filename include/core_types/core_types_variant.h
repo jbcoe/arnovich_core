@@ -50,6 +50,9 @@ typedef struct core_types_variant variant;
  */
 void variant_free(variant v);
 
+//deep copy
+variant variant_copy(variant v);
+
 /*
  * @brief Returns a string representation of a variant
  * Note: Returned array is a local statically allocated array, so watch out!
