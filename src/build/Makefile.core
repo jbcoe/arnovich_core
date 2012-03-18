@@ -136,12 +136,12 @@ PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_
 %.${BUILDEXT} : %.c
 	@echo "compiling: $<"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CCARGBIN_) -o $(TMPLIB)$@ $<
+	$(CC) $(CCARGBIN_) -o $(TMPLIB)$(@D)/$(*F) $<
 	
 %.${BUILDEXT} : %.cpp
 	@echo "compiling: $<"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CPPARGBIN) -o $(TMPLIB)$@ $<
+	$(CC) $(CPPARGBIN) -o $(TMPLIB)$(@D)/$(*F) $<
 
 #### various targets
 
