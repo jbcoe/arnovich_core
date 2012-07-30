@@ -96,11 +96,11 @@ VPATH = $(TMPLIB):$(SRCLIB):$(SRCBINLIB):$(SRCTESTLIB)
 PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_MINOR_VERSION) --builddir $(TMPLIBPY)
 
 #ifdef USE_CORE
-	#PYLIB_ARGS += --use_core
+	PYLIB_ARGS += --use_core
 #endif
 
 #ifdef USE_MATH
-	#PYLIB_ARGS += --use_math
+	PYLIB_ARGS += --use_math
 #endif
 
 # include $(DEPFILES)
