@@ -1,18 +1,36 @@
 
 # MINGW build - not sure it works anymore
 # NOT maintained anymore but keeping it around
-BUILDBIN=$(TESTDIR)\\bin\\
-BUILDLIB=.\\
-CC=gcc
-LN=gcc
-CCARG= -I include/ -I ./ -c -Wall
-CCARGBIN= -I include/ -I ./ -Wall -L$(BUILDLIB) -l$(LIBNAME)
-LNARG=-Wl,-v -shared
+BUILDBIN=$(TESTDIR)/bin/
+BUILDLIB=./
+CC=g++
+LN=g++
+PYTHON=python.exe
+CARG= -I include/ -Wall
+LARG=
 EXTLIB=dll
 PYLIB_EXT=--compiler=mingw32
 
 ifdef USE_PYTHON
-	CCARG += -I "E:\\Python27\\include"
-	LNARG += -L"E:\\Python27\\libs" -lpython27
+	CARG += -I "E:/Python27/include"
+	LARG += -L"E:/Python27/libs" -lpython27
 endif
+
+ifdef USE_PTHREAD
+        LARG += -lpthread
+endif
+
+ifdef USE_CORE
+        CARG += -I ${ARNOVICHLIB}core/include
+        LARG += -L "F:/work/core" -larnovich_core
+endif
+
+ifdef USE_LIBXML
+	CARG += -I "E:/libs/libxml2-2.7.8.win32/include" -I "E:/libs/iconv-1.9.2.win32/include"
+	LARG += -L "E:/libs/libxml2-2.7.8.win32/lib" -llibxml2 -L "E:/libs/iconv-1.9.2.win32/lib" -liconv
+endif
+
+CCARGBIN = $(CARG) $(LARG) -L$(BUILDLIB) -l$(LIBNAME)
+CCARG = $(CARG) -c
+LNARG = $(LARG) -Wl,-v -shared
 
