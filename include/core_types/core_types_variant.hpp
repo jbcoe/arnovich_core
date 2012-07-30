@@ -78,6 +78,11 @@ public:
         m_count = new int;
         *m_count = 1;
     }
+
+    static variant from_error(const std::string& s)
+    {
+        return variant(CVariant::variant_from_error(const_cast<char*>(s.c_str())));
+    }
 private:
     variant(CVariant::matrix m) : m_v(CVariant::variant_from_matrix(m))
     {
@@ -108,6 +113,11 @@ public:
     operator CVariant::matrix() const
     {
         return CVariant::variant_as_matrix(m_v);
+    }
+
+    bool is_empty() const
+    {
+        return CVariant::_variant_is_empty(m_v);
     }
 
     bool is_int() const

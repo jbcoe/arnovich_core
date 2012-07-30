@@ -3,27 +3,146 @@
 #define __CORE_PYTHON_WRAP_H__
 
 #include <Python.h>
+#include "structmember.h"
 #include <core_python/core_python.h>
 
 // simple function with no python state 
 typedef int (*py_error_function)(char* name, char* msg);
 PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_error_function err, void *self);
 
-//TODO PY_Object adder is not handling self-referential functions
-//TODO for now: if self=NULL in funciton-wrapper then cast data-member to void* and pass as first 
-//probably need to add another DEFINE_PY_FUNCTION
-//argument to wrapped function
+struct Generic_Py_Struct
+{
+    PyObject_HEAD
+    void* m_data;
+};
 
-#define DEFINE_PY_FUNCTION(NAME, FUNCTION, NARGS, DESCRIPTION) \
+#define DEFINE_PY_FUNCTION_BASE(NAME, FUNCTION, NARGS, DESCRIPTION) \
 	static py_error_function NAME##_error = NULL; \
     static PyObject* PyFunc_##NAME(PyObject* self, PyObject* args) \
     { \
-        return python_wrap_function(args, NARGS, FUNCTION, NAME##_error, NULL); \
+        return python_wrap_function(args, NARGS, (void*)FUNCTION, NAME##_error, ((struct Generic_Py_Struct*)self)->m_data); \
     }\
     static char NAME##_name[] = #NAME; \
     static char NAME##_description[] = #DESCRIPTION;
 
-#define START_PY_OBJECT(NAME, DATA_TYPE, DATA_INIT, DATA_FREE) \
+#define EQUIV_PY_FUNCTION0(NAME) \
+static PyObject* PyFunc_##NAME##0(PyObject* self) \
+{ \
+    return PyFunc_##NAME(self, NULL); \
+}
+
+
+#define DEFINE_PY_FUNCTION(NAME, FUNCTION, NARGS, DESCRIPTION) \
+        variant NAME##_py_wrap_##FUNCTION(void* self, ...) \
+        { \
+            typedef variant (*wrapped_function0)(); \
+            typedef variant (*wrapped_function1)(variant); \
+            typedef variant (*wrapped_function2)(variant, variant); \
+            typedef variant (*wrapped_function3)(variant, variant, variant); \
+            typedef variant (*wrapped_function4)(variant, variant, variant, variant); \
+            typedef variant (*wrapped_function5)(variant, variant, variant, variant, variant); \
+            va_list vl; \
+            va_start(vl, self); \
+            variant rtn; \
+            void* func = FUNCTION; \
+            switch(NARGS) \
+            { \
+            case 0: \
+                rtn = ((wrapped_function0)func)(); \
+                break; \
+            case 1: \
+                rtn = ((wrapped_function1)func)(va_arg(vl,variant)); \
+                break; \
+            case 2: \
+                rtn = ((wrapped_function2)func)(va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            case 3: \
+                rtn = ((wrapped_function3)func)(va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            case 4: \
+                rtn = ((wrapped_function4)func)(va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            case 5: \
+                rtn = ((wrapped_function5)func)(va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            default: \
+                break; \
+            } \
+            va_end(vl); \
+            return rtn; \
+        }; \
+        DEFINE_PY_FUNCTION_BASE(NAME, NAME##_py_wrap_##FUNCTION, NARGS, DESCRIPTION)
+
+#define DEFINE_PY_OBJECT_FUNCTION(NAME, FUNCTION, NARGS, DESCRIPTION, TYPE) \
+        variant NAME##_py_wrap_##FUNCTION(void* self, ...) \
+        { \
+            typedef variant (*wrapped_function0)(TYPE*); \
+            typedef variant (*wrapped_function1)(TYPE*, variant); \
+            typedef variant (*wrapped_function2)(TYPE*, variant, variant); \
+            typedef variant (*wrapped_function3)(TYPE*, variant, variant, variant); \
+            typedef variant (*wrapped_function4)(TYPE*, variant, variant, variant, variant); \
+            typedef variant (*wrapped_function5)(TYPE*, variant, variant, variant, variant, variant); \
+            va_list vl; \
+            va_start(vl, self); \
+            variant rtn; \
+            TYPE* slf = (TYPE*)self; \
+            void* func = FUNCTION; \
+            switch(NARGS) \
+            { \
+            case 0: \
+                rtn = ((wrapped_function0)func)(slf); \
+                break; \
+            case 1: \
+                rtn = ((wrapped_function1)func)(slf, \
+                                                va_arg(vl,variant)); \
+                break; \
+            case 2: \
+                rtn = ((wrapped_function2)func)(slf, \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            case 3: \
+                rtn = ((wrapped_function3)func)(slf, \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            case 4: \
+                rtn = ((wrapped_function4)func)(slf, \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            case 5: \
+                rtn = ((wrapped_function5)func)(slf, \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant), \
+                                                va_arg(vl,variant)); \
+                break; \
+            default: \
+                rtn = VARIANT_EMPTY; \
+                break; \
+            } \
+            va_end(vl); \
+            return rtn; \
+        }; \
+        DEFINE_PY_FUNCTION_BASE(NAME, NAME##_py_wrap_##FUNCTION, NARGS, DESCRIPTION)
+
+#define START_PY_OBJECT2(NAME, DATA_TYPE, DATA_INIT, DATA_FREE, DATA_NEW) \
+    DEFINE_PY_OBJECT_FUNCTION(DATA_NEW##_internal_new, DATA_NEW, 1, dummy, DATA_TYPE) \
     typedef struct NAME##_struct \
     { \
         PyObject_HEAD \
@@ -39,7 +158,8 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_err
         Py##NAME *self = (Py##NAME*)type->tp_alloc(type, 0); \
         if(self) \
         { \
-            DATA_INIT(&self->m_data); \
+            DATA_INIT(&(self->m_data)); \
+            PyFunc_##DATA_NEW##_internal_new((PyObject*)self, args); \
         } \
         return (PyObject*)self; \
     } \
@@ -47,12 +167,18 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_err
     { \
         return 0; \
     } \
-    static PyMemberDef NAME##_members[] = { {NULL} }; \
-    static PyMemberDef NAME##_getsetters[] = { {NULL} }; \
+    static PyMemberDef NAME##_members[] = { { NULL } }; \
     static PyMethodDef NAME##_methods[] = {
+
+#define START_PY_OBJECT(NAME, DATA_TYPE, DATA_INIT, DATA_FREE) \
+    static void dummy_##NAME(void* p, void* q) {} \
+    START_PY_OBJECT2(NAME, DATA_TYPE, DATA_INIT, DATA_FREE, dummy)
 
 #define ADD_OBJECT_FUNCTION(NAME) \
     {NAME##_name, (PyCFunction)PyFunc_##NAME, METH_VARARGS, NAME##_description},
+
+#define ADD_OBJECT_FUNCTION2(NAME, FUNC) \
+    {#NAME, (PyCFunction)PyFunc_##FUNC, METH_VARARGS, FUNC##_description},
 
 #define END_PY_OBJECT(NAME) \
         {NULL,NULL,0,NULL} \
@@ -88,7 +214,7 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_err
         0,                                          /*tp_iternext*/ \
         NAME##_methods,                             /*tp_methods*/ \
         NAME##_members,                             /*tp_members*/ \
-        NAME##_getsetters,                          /*tp_getset*/ \
+        0,                                          /*tp_getset*/ \
         0,                                          /*tp_base*/ \
         0,                                          /*tp_dict*/ \
         0,                                          /*tp_descr_get*/ \
@@ -152,7 +278,7 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_err
             if(strcmp(name, NAME##_objects[i].m_name) == 0) \
             { \
                 PyErr_SetString((PyObject*)NAME##_objects[i].m_type, msg); \
-				return 1; \
+                return 1; \
             } \
         } \
 		return 0; \
@@ -167,11 +293,11 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_err
         struct PyObjects **objects = &NAME##_objects; \
         size_t *nobjects = &NAME##_nobjects; \
         PyMethodDef **methods = &NAME##_methods; \
-		py_error_function error_func = NAME##_error;
+        py_error_function error_func = NAME##_error;
 
 #define ADD_PY_FUNCTION(NAME) \
-		NAME##_error = error_func; \
-		Py_add_method(NAME##_name,  PyFunc_##NAME, METH_VARARGS, NAME##_description);
+        NAME##_error = error_func; \
+        Py_add_method(NAME##_name,  PyFunc_##NAME, METH_VARARGS, NAME##_description);
 
 #define ADD_PY_EXCEPTION(NAME) \
 		char *exp_##NAME = (char*)malloc(strlen(name)+strlen(#NAME)+2); \
