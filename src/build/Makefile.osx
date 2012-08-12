@@ -7,8 +7,8 @@ BUILDLIB=/usr/lib/
 BUILDBIN=$(TESTDIR)/bin/
 
 ifeq (${MACPORTS},1)
-	CC=/opt/local/bin/g++-mp-4.5
-	LN=/opt/local/bin/g++-mp-4.5
+	CC=/opt/local/bin/g++-mp-4.8
+	LN=/opt/local/bin/g++-mp-4.8
 	PYTHON=/opt/local/bin/python
 else
 	CC=/usr/bin/g++

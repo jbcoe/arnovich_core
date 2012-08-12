@@ -52,18 +52,18 @@ SRCPYFILES += $(foreach dir,$(SRCPYDIRS),$(wildcard $(dir)/*.cpp))
 
 # dependencies and objects
 BUILDEXT = $(BUILD).DEBUG$(DEBUG)
-OBJFILES_ = $(subst $(SRCLIB),,$(SRCFILES:.c=.${BUILDEXT}.o))
-OBJFILES += $(OBJFILES_:.cpp=.${BUILDEXT}.o)
-DEPFILES_ = $(subst $(SRCLIB),,$(SRCFILES:.c=.d))
-DEPFILES += $(DEPFILES_:.cpp=.d)
+OBJFILES_ = $(subst $(SRCLIB),,$(SRCFILES:.c=.${BUILDEXT}.c.o))
+OBJFILES += $(OBJFILES_:.cpp=.${BUILDEXT}.cpp.o)
+DEPFILES_ = $(subst $(SRCLIB),,$(SRCFILES:.c=.c.d))
+DEPFILES += $(DEPFILES_:.cpp=.cpp.d)
 BINFILES_ = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.${BUILDEXT}))
 BINFILES += $(BINFILES_:.cpp=.${BUILDEXT})
-DEPBINFILES_ = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.d))
-DEPBINFILES += $(DEPBINFILES_:.cpp=.d)
+DEPBINFILES_ = $(subst $(SRCBINLIB),,$(SRCBINFILES:.c=.c.d))
+DEPBINFILES += $(DEPBINFILES_:.cpp=.cpp.d)
 TESTFILES_ = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.${BUILDEXT}))
 TESTFILES += $(TESTFILES_:.cpp=.${BUILDEXT})
-DEPTESTFILES_ = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.d))
-DEPTESTFILES += $(DEPTESTFILES_:.cpp=.d)
+DEPTESTFILES_ = $(subst $(SRCTESTLIB),,$(SRCTESTFILES:.c=.c.d))
+DEPTESTFILES += $(DEPTESTFILES_:.cpp=.cpp.d)
 
 # some common build stuff
 MKDIR=mkdir -p
@@ -107,41 +107,41 @@ PYLIB_ARGS = --name $(LIBNAME) --majorv $(BUILD_MAJOR_VERSION) --minorv $(BUILD_
 # include $(DEPBINFILES)
 # include $(DEPTESTFILES)
 
-%.${BUILDEXT}.o : %.c
+%.${BUILDEXT}.c.o : %.c.d %.c
 	@echo "compiling: $<"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CCARG_) -o $(TMPLIB)$@ $<
+	$(CC) $(CCARG_) -o $(TMPLIB)$@ $(lastword $^)
 
-%.${BUILDEXT}.o : %.cpp
+%.${BUILDEXT}.cpp.o : %.cpp.d %.cpp
 	@echo "compiling: $<"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CPPARG) -o $(TMPLIB)$@ $<
+	$(CC) $(CPPARG) -o $(TMPLIB)$@ $(lastword $^)
 
-%.d: %.c
+%.c.d: %.c
 	@echo "depending: $<"
 	mkdir -p $(TMPLIB)$(@D)
 	@set -e; rm -f $(TMPLIB)$@; \
-	$(CC) -MM $(CCARGD_) $< > $(TMPLIB)$@.$$$$; \
+	$(CC) -MM $(CCARG_) $< > $(TMPLIB)$@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $(TMPLIB)$@ : ,g' < $(TMPLIB)$@.$$$$ > $(TMPLIB)$@; \
 	rm -f $(TMPLIB)$@.$$$$
 
-%.d: %.cpp
+%.cpp.d: %.cpp
 	@echo "depending: $<"
 	mkdir -p $(TMPLIB)$(@D)
 	@set -e; rm -f $(TMPLIB)$@; \
-	$(CC) -MM $(CPPARGD) $< > $(TMPLIB)$@.$$$$; \
+	$(CC) -MM $(CCARG_) $< > $(TMPLIB)$@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,$(@D)/\1.o $(TMPLIB)$@ : ,g' < $(TMPLIB)$@.$$$$ > $(TMPLIB)$@; \
 	rm -f $(TMPLIB)$@.$$$$
 
-%.${BUILDEXT} : %.c
-	@echo "compiling: $<"
+%.${BUILDEXT} : %.c.d %.c
+	@echo "compiling: $(lastword $^)"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CCARGBIN_) -o $(TMPLIB)$(@D)/$(*F) $<
+	$(CC) $(CCARGBIN_) -o $(TMPLIB)$(@D)/$(*F) $(lastword $^)
 	
-%.${BUILDEXT} : %.cpp
-	@echo "compiling: $<"
+%.${BUILDEXT} : %.cpp.d %.cpp
+	@echo "compiling: $(lastword $^)"
 	mkdir -p $(TMPLIB)$(@D)
-	$(CC) $(CPPARGBIN) -o $(TMPLIB)$(@D)/$(*F) $<
+	$(CC) $(CPPARGBIN) -o $(TMPLIB)$(@D)/$(*F) $(lastword $^)
 
 #### various targets
 
@@ -155,10 +155,11 @@ docs:
 	$(MKDIR) docs
 	(cat $(MAKEFILEDIR)/core.doxy; echo "PROJECT_NUMBER=$(BUILD_MAJOR_VERSION).$(BUILD_MINOR_VERSION)"; echo "PROJECT_NAME=$(LIBNAME)") | doxygen -
 
+.PHONY: pylib
 pylib:
 	mkdir -p $(TMPLIBPY)/arnovich/
 	touch $(TMPLIBPY)/arnovich/__init__.py
-	echo -n -e '\nfrom arnovich._$(NAME) import *\n' >> $(TMPLIBPY)/arnovich/$(NAME).py
+	echo '\nfrom arnovich._$(NAME) import *\n' > $(TMPLIBPY)/arnovich/$(NAME).py
 	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --files $(SRCPYFILES)
 	$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --files $(SRCPYFILES)
 
