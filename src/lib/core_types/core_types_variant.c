@@ -17,6 +17,7 @@ void variant_free(variant v)
 {
     switch(v.m_type)
     {
+    case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_INT:
     case CORE_TYPES_VARIANT_DOUBLE:
         break;
@@ -36,6 +37,7 @@ variant variant_copy(variant v)
     variant rtn = v;
     switch(v.m_type)
     {
+    case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_INT:
     case CORE_TYPES_VARIANT_DOUBLE:
         break;
@@ -56,6 +58,14 @@ char* variant_to_string(variant v)
     static char str[50];
     switch(v.m_type)
     {
+    case CORE_TYPES_VARIANT_BOOL:
+        if(v.m_v.m_i)
+        {
+            sprintf(str, "TRUE");
+        } else {
+            sprintf(str, "FALSE");
+        }
+        break;
     case CORE_TYPES_VARIANT_INT:
         sprintf(str, "%i", v.m_v.m_i);
         break;
@@ -77,10 +87,36 @@ char* variant_to_string(variant v)
     return str;
 }
 
+char* variant_to_string_(variant v)
+{
+    switch(v.m_type)
+    {
+    case CORE_TYPES_VARIANT_STRING:
+        return v.m_v.m_s.m_s;
+    case CORE_TYPES_VARIANT_BOOL:
+    case CORE_TYPES_VARIANT_INT:
+    case CORE_TYPES_VARIANT_DOUBLE:
+    case CORE_TYPES_VARIANT_MATRIX:
+    default:
+        break;
+    }
+    return variant_to_string(v);
+}
+
+
 int variant_equal(variant a, variant b)
 {
     switch(a.m_type)
     {
+    case CORE_TYPES_VARIANT_BOOL:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_BOOL:
+            return (a.m_v.m_i == b.m_v.m_i);
+        default:
+            break;
+        }
+        break;
     case CORE_TYPES_VARIANT_INT:
         switch(b.m_type)
         {
@@ -134,6 +170,206 @@ int variant_equal(variant a, variant b)
         break;
     }
     return 0;
+}
+
+int variant_less(variant a, variant b)
+{
+    switch(a.m_type)
+    {
+    case CORE_TYPES_VARIANT_INT:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_INT:
+            return (a.m_v.m_i < b.m_v.m_i);
+        case CORE_TYPES_VARIANT_DOUBLE:
+            return (a.m_v.m_i < (double)b.m_v.m_d);
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_DOUBLE:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_INT:
+            return (a.m_v.m_d < (double)b.m_v.m_i);
+        case CORE_TYPES_VARIANT_DOUBLE:
+            return (a.m_v.m_d < b.m_v.m_d);
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_STRING:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_STRING:
+            return (strcmp(a.m_v.m_s.m_s, b.m_v.m_s.m_s) < 0);
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_BOOL:
+    case CORE_TYPES_VARIANT_ERROR:
+        break;
+    case CORE_TYPES_VARIANT_MATRIX:
+        //TODO
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+
+int variant_and(variant a, variant b)
+{
+    switch(a.m_type)
+    {
+    case CORE_TYPES_VARIANT_BOOL:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_BOOL:
+            return (a.m_v.m_i && b.m_v.m_i);
+        default:
+            break;
+        }
+        break;
+        default:
+            break;
+    }
+    return 0;
+}
+int variant_or(variant a, variant b)
+{
+    switch(a.m_type)
+    {
+    case CORE_TYPES_VARIANT_BOOL:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_BOOL:
+            return (a.m_v.m_i || b.m_v.m_i);
+        default:
+            break;
+        }
+        break;
+        default:
+            break;
+    }
+    return 0;
+}
+variant variant_add(variant a, variant b)
+{
+    variant rtn = VARIANT_EMPTY;
+    switch(a.m_type)
+    {
+    case CORE_TYPES_VARIANT_INT:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_INT:
+            rtn.m_type = CORE_TYPES_VARIANT_INT;
+            rtn.m_v.m_i = (a.m_v.m_i + b.m_v.m_i);
+            break;
+        case CORE_TYPES_VARIANT_DOUBLE:
+            rtn.m_type = CORE_TYPES_VARIANT_DOUBLE;
+            rtn.m_v.m_d = ((double)a.m_v.m_i + b.m_v.m_d);
+            break;
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_DOUBLE:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_INT:
+            rtn.m_type = CORE_TYPES_VARIANT_DOUBLE;
+            rtn.m_v.m_d = (a.m_v.m_d + (double)b.m_v.m_i);
+            break;
+        case CORE_TYPES_VARIANT_DOUBLE:
+            rtn.m_type = CORE_TYPES_VARIANT_DOUBLE;
+            rtn.m_v.m_d = (a.m_v.m_d + b.m_v.m_d);
+            break;
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_STRING:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_STRING:
+            rtn.m_type = CORE_TYPES_VARIANT_STRING;
+            rtn.m_v.m_s.m_l = a.m_v.m_s.m_l+b.m_v.m_s.m_l;
+            rtn.m_v.m_s.m_s = (char*)malloc(sizeof(char)*rtn.m_v.m_s.m_l);
+            strcpy(rtn.m_v.m_s.m_s, a.m_v.m_s.m_s);
+            strcat(rtn.m_v.m_s.m_s, b.m_v.m_s.m_s);
+            break;
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_BOOL:
+    case CORE_TYPES_VARIANT_ERROR:
+        break;
+    case CORE_TYPES_VARIANT_MATRIX:
+        //TODO
+        break;
+    default:
+        break;
+    }
+    return rtn;
+}
+
+variant variant_multiply(variant a, variant b)
+{
+    variant rtn = VARIANT_EMPTY;
+    switch(a.m_type)
+    {
+    case CORE_TYPES_VARIANT_INT:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_INT:
+            rtn.m_type = CORE_TYPES_VARIANT_INT;
+            rtn.m_v.m_i = (a.m_v.m_i * b.m_v.m_i);
+            break;
+        case CORE_TYPES_VARIANT_DOUBLE:
+            rtn.m_type = CORE_TYPES_VARIANT_DOUBLE;
+            rtn.m_v.m_d = ((double)a.m_v.m_i * b.m_v.m_d);
+            break;
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_DOUBLE:
+        switch(b.m_type)
+        {
+        case CORE_TYPES_VARIANT_INT:
+            rtn.m_type = CORE_TYPES_VARIANT_DOUBLE;
+            rtn.m_v.m_d = (a.m_v.m_d * (double)b.m_v.m_i);
+            break;
+        case CORE_TYPES_VARIANT_DOUBLE:
+            rtn.m_type = CORE_TYPES_VARIANT_DOUBLE;
+            rtn.m_v.m_d = (a.m_v.m_d * b.m_v.m_d);
+            break;
+        default:
+            break;
+        }
+        break;
+    case CORE_TYPES_VARIANT_STRING:
+    case CORE_TYPES_VARIANT_BOOL:
+    case CORE_TYPES_VARIANT_ERROR:
+        break;
+    case CORE_TYPES_VARIANT_MATRIX:
+        //TODO
+        break;
+    default:
+        break;
+    }
+    return rtn;
+}
+
+variant _variant_from_bool(int b)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_BOOL;
+    v.m_v.m_i = b;
+    return v;
 }
 
 variant _variant_from_double(double d)
@@ -221,6 +457,15 @@ int _variant_as_int(variant v)
     return 0;
 }
 
+int _variant_as_bool(variant v)
+{
+    if(CORE_TYPES_VARIANT_BOOL == v.m_type)
+    {
+        return v.m_v.m_i;
+    }
+    return 0;
+}
+
 double _variant_as_double(variant v)
 {
     if(CORE_TYPES_VARIANT_DOUBLE == v.m_type)
@@ -250,6 +495,11 @@ variant _variant_nil()
 int _variant_is_empty(variant v)
 {
     return (CORE_TYPES_VARIANT_EMPTY == v.m_type);
+}
+
+int _variant_is_bool(variant v)
+{
+    return (CORE_TYPES_VARIANT_BOOL == v.m_type);
 }
 
 int _variant_is_int(variant v)
