@@ -416,6 +416,14 @@ variant variant_from_matrix(matrix m)
     return v;
 }
 
+variant variant_matrix(matrix m)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_MATRIX;
+    v.m_v.m_m = m;
+    return v;
+}
+
 char* variant_as_string(variant v)
 {
     if(CORE_TYPES_VARIANT_STRING == v.m_type)

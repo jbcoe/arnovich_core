@@ -74,7 +74,11 @@ variant variant_from_string(char* c);
 
 variant variant_from_error(char* c);
 
+// copies the matrix
 variant variant_from_matrix(matrix m);
+
+// does not copy the matrix
+variant variant_matrix(matrix m);
 
 char* variant_as_string(variant v);
 
