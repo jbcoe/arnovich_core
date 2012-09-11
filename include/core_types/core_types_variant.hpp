@@ -54,7 +54,12 @@ public:
         }
     }
 
-    //TODO add error constructor and implicit cast
+    variant(bool b) : m_v(CVariant::_variant_from_bool((int)b))
+    {
+        m_count = new int;
+        *m_count = 1;
+    }
+
     variant(int i) : m_v(CVariant::_variant_from_int(i))
     {
         m_count = new int;
@@ -95,6 +100,11 @@ private:
         *m_count = 1;
     }
 public:
+    operator bool() const
+    {
+        return (bool)CVariant::_variant_as_bool(m_v);
+    }
+
     operator int() const
     {
         return CVariant::_variant_as_int(m_v);
@@ -118,6 +128,11 @@ public:
     bool is_empty() const
     {
         return CVariant::_variant_is_empty(m_v);
+    }
+
+    bool is_bool() const
+    {
+        return CVariant::_variant_is_bool(m_v);
     }
 
     bool is_int() const
@@ -150,9 +165,46 @@ public:
         return CVariant::variant_equal(m_v, v.m_v);
     }
 
+    bool operator <(const variant& v) const
+    {
+        return CVariant::variant_less(m_v, v.m_v);
+    }
+
+    bool operator >(const variant& v) const
+    {
+        return CVariant::variant_less(v.m_v, m_v);
+    }
+
+    bool operator &&(const variant& v) const
+    {
+        return CVariant::variant_and(m_v, v.m_v);
+    }
+
+    bool operator ||(const variant& v) const
+    {
+        return CVariant::variant_or(m_v, v.m_v);
+    }
+
+    variant operator +(const variant& v) const
+    {
+        CVariant::variant crtn = CVariant::variant_add(m_v, v.m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
+    }
+
+    variant operator *(const variant& v) const
+    {
+        CVariant::variant crtn = CVariant::variant_multiply(m_v, v.m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
+    }
+
+
     std::string to_string() const
     {
-        return std::string(CVariant::variant_to_string(m_v));
+        return std::string(CVariant::variant_to_string_(m_v));
     }
 
     const variant get(unsigned int row, unsigned int col) const

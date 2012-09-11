@@ -17,11 +17,12 @@
 typedef enum
 {
     CORE_TYPES_VARIANT_EMPTY     = 0,
-    CORE_TYPES_VARIANT_INT       = 1,
-    CORE_TYPES_VARIANT_DOUBLE    = 2,
-    CORE_TYPES_VARIANT_STRING    = 3,
-    CORE_TYPES_VARIANT_MATRIX    = 4,
-    CORE_TYPES_VARIANT_ERROR     = 5
+    CORE_TYPES_VARIANT_BOOL      = 1,
+    CORE_TYPES_VARIANT_INT       = 2,
+    CORE_TYPES_VARIANT_DOUBLE    = 3,
+    CORE_TYPES_VARIANT_STRING    = 4,
+    CORE_TYPES_VARIANT_MATRIX    = 5,
+    CORE_TYPES_VARIANT_ERROR     = 6,
 } CORE_TYPES_VARIANT_TYPE;
 
 
@@ -58,8 +59,15 @@ variant variant_copy(variant v);
  * Note: Returned array is a local statically allocated array, so watch out!
  */
 char* variant_to_string(variant v);
+char* variant_to_string_(variant v);
 
+// operators
 int variant_equal(variant a, variant b);
+int variant_less(variant a, variant b);
+int variant_and(variant a, variant b);
+int variant_or(variant a, variant b);
+variant variant_add(variant a, variant b);
+variant variant_multiply(variant a, variant b);
 
 
 variant variant_from_string(char* c);
@@ -87,15 +95,21 @@ matrix variant_as_matrix(variant v);
 #define VARIANT_EMPTY (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
 #define VARIANT_NIL (variant){CORE_TYPES_VARIANT_EMPTY, {.m_i=0} };
 
+#define variant_from_bool(b) (variant){CORE_TYPES_VARIANT_BOOL, {.m_i=b}}
+
 #define variant_from_int(i) (variant){CORE_TYPES_VARIANT_INT, {.m_i=i}}
 
 #define variant_from_double(d) (variant){CORE_TYPES_VARIANT_DOUBLE, {.m_d=d}}
+
+#define variant_as_bool(v) ((CORE_TYPES_VARIANT_BOOL == v.m_type)?v.m_v.m_i:0)
 
 #define variant_as_int(v) ((CORE_TYPES_VARIANT_INT == v.m_type)?v.m_v.m_i:((CORE_TYPES_VARIANT_DOUBLE == v.m_type)?((int)v.m_v.m_i):0))
 
 #define variant_as_double(v) ((CORE_TYPES_VARIANT_DOUBLE == v.m_type)?v.m_v.m_d:((CORE_TYPES_VARIANT_INT == v.m_type)?((double)v.m_v.m_i):0.0))
 
 #define variant_is_empty(v) (CORE_TYPES_VARIANT_EMPTY == v.m_type)
+
+#define variant_is_bool(v) (CORE_TYPES_VARIANT_BOOL == v.m_type)
 
 #define variant_is_int(v) (CORE_TYPES_VARIANT_INT == v.m_type)
 
@@ -118,8 +132,14 @@ variant _variant_nil();
 variant _variant_from_double(double d);
 #define variant_from_double(d) _variant_from_double(d)
 
-variant _variant_from_int(double d);
-#define variant_from_int(d) _variant_from_int(d)
+variant _variant_from_bool(int b);
+#define variant_from_bool(b) _variant_from_bool(b)
+
+variant _variant_from_int(int i);
+#define variant_from_int(i) _variant_from_int(i)
+
+int _variant_as_bool(variant v);
+#define variant_as_bool(v) _variant_as_bool(v)
 
 int _variant_as_int(variant v);
 #define variant_as_int(v) _variant_as_int(v)
@@ -129,6 +149,9 @@ double _variant_as_double(variant v);
 
 int _variant_is_empty(variant v);
 #define variant_is_empty(v) _variant_is_empty(v)
+
+int _variant_is_bool(variant v);
+#define variant_is_bool(v) _variant_is_bool(v)
 
 int _variant_is_int(variant v);
 #define variant_is_int(v) _variant_is_int(v)
