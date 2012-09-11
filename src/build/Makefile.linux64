@@ -9,6 +9,7 @@ CARG= -I include/ -Wall
 LARG =
 EXTLIB=so
 PYLIB_EXT=
+ECHO_CMD=echo -e
 
 ifdef USE_PYTHON
 	CARG += -I /usr/include/python2.7/
