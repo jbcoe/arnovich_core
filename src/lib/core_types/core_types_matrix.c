@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define STRING_LENGTH 1000
+
 matrix matrix_init(unsigned int width, unsigned int height)
 {
     matrix m;
@@ -82,7 +84,7 @@ matrix matrix_identity(int n)
 
 char* matrix_to_string(matrix m)
 {
-    static char str[10][1000];
+    static char str[10][STRING_LENGTH];
     static int n = 0;
     ++n;
     if(n==10) n = 0;
@@ -97,6 +99,7 @@ char* matrix_to_string(matrix m)
             strcat(str[n], ",");
         }
         strcat(str[n], "]");
+        //if(strlen(str[n]) > STRING_LENGTH) return "ERROR: allocated more...";
     }
     strcat(str[n], "]");
     return str[n];

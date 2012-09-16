@@ -13,6 +13,8 @@
 #include <string.h>
 #include <math.h>
 
+#define STRING_LENGTH 1000
+
 void variant_free(variant v)
 {
     switch(v.m_type)
@@ -55,7 +57,7 @@ variant variant_copy(variant v)
 
 char* variant_to_string(variant v)
 {
-    static char str[50];
+    static char str[STRING_LENGTH];
     switch(v.m_type)
     {
     case CORE_TYPES_VARIANT_BOOL:
@@ -73,9 +75,11 @@ char* variant_to_string(variant v)
         sprintf(str, "%f", v.m_v.m_d);
         break;
     case CORE_TYPES_VARIANT_STRING:
+        if(STRING_LENGTH < v.m_v.m_s.m_l) return "ERROR: allocated more...";
         sprintf(str, "%s", v.m_v.m_s.m_s);
         break;
     case CORE_TYPES_VARIANT_ERROR:
+        if(STRING_LENGTH < v.m_v.m_s.m_l) return "ERROR: allocated more...";
         sprintf(str, "#ERROR: %s", v.m_v.m_s.m_s);
         break;
     case CORE_TYPES_VARIANT_MATRIX:
@@ -393,7 +397,7 @@ variant variant_from_string(char *c)
     variant v;
     v.m_type = CORE_TYPES_VARIANT_STRING;
     v.m_v.m_s.m_l = strlen(c);
-    v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*v.m_v.m_s.m_l); 
+    v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(v.m_v.m_s.m_l+1));
     strcpy(v.m_v.m_s.m_s, c);
     return v;
 }
@@ -403,7 +407,7 @@ variant variant_from_error(char *c)
     variant v;
     v.m_type = CORE_TYPES_VARIANT_ERROR;
     v.m_v.m_s.m_l = strlen(c);
-    v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*v.m_v.m_s.m_l); 
+    v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(v.m_v.m_s.m_l+1));
     strcpy(v.m_v.m_s.m_s, c);
     return v;
 }
