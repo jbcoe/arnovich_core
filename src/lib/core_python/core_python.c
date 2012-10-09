@@ -7,6 +7,7 @@
 
 variant core_python_py_to_variant(PyObject* o)
 {
+    if((o == NULL) || (o == Py_None))return VARIANT_NIL;
     if(PyInt_Check(o))
     {
         return variant_from_int(PyInt_AsLong(o));
@@ -44,6 +45,10 @@ variant core_python_py_to_variant(PyObject* o)
         }
     }
     if(PyList_Check(o))
+    {
+        return variant_from_matrix(core_python_py_to_matrix(o));
+    }
+    if(PyDict_Check(o))
     {
         return variant_from_matrix(core_python_py_to_matrix(o));
     }
@@ -113,26 +118,55 @@ matrix core_python_py_to_matrix(PyObject* o)
         }
         return m;
     }
+    if(PyDict_Check(o))
+    {
+        int height = PyDict_Size(o), width = 2;
+        matrix m = matrix_init(width, height);
+        PyObject *key, *value;
+        Py_ssize_t pos = 0;
+        int i=0;
+        while(PyDict_Next(o, &pos, &key, &value))
+        {
+            matrix_set(m, 0, i, core_python_py_to_variant(key));
+            matrix_set(m, 1, i, core_python_py_to_variant(value));
+            ++i;
+        }
+        return m;
+    }
     return MATRIX_IDENTITY(0);
 }
 
 PyObject* core_python_matrix_to_py(matrix m)
 {
     int height = m.m_height;
+    if(height == 1)
+    {
+        int width = m.m_width;
+        PyObject *row = PyList_New(width);
+        if(row)
+        {
+            int j = 0;
+            for(;j<width;++j)
+            {
+                PyList_SetItem(row, j, core_python_variant_to_py(matrix_get(m, j, 0)));
+            }
+        }
+        return row;
+    }
     PyObject* rows = PyList_New(height);
     if(rows)
     {
-        int i=0;
         int width = m.m_width;
+        int i=0;
         for(;i<height;++i)
         {
-            int j = 0;
             PyObject *row = PyList_New(width);
             if(row)
             {
+                int j = 0;
                 for(;j<width;++j)
                 {
-                    PyList_SetItem(row, j, core_python_variant_to_py(matrix_get(m, j, i))); 
+                    PyList_SetItem(row, j, core_python_variant_to_py(matrix_get(m, j, i)));
                 }
             }
             PyList_SetItem(rows, i, row);
