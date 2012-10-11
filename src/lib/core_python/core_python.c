@@ -52,6 +52,14 @@ variant core_python_py_to_variant(PyObject* o)
     {
         return variant_from_matrix(core_python_py_to_matrix(o));
     }
+    if(PyBool_Check(o))
+    {
+        if(o == Py_True)
+        {
+            return variant_from_bool(1);
+        }
+        return variant_from_bool(0);
+    }
     return VARIANT_NIL;
 }
 
@@ -76,6 +84,15 @@ PyObject* core_python_variant_to_py(variant v)
     if(variant_is_empty(v))
     {
         Py_RETURN_TRUE;
+    }
+    if(variant_is_bool(v))
+    {
+        if(variant_as_bool(v))
+        {
+            Py_RETURN_TRUE;
+        } else {
+            Py_RETURN_FALSE;
+        }
     }
     return NULL;
 }
