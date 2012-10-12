@@ -7,6 +7,7 @@
 #include <core_python/core_python_wrap.h>
 
 #include <core_debug/core_debug.h>
+_DEBUG_GROUP(PYTHON)
 
 variant set_level(variant i)
 {
@@ -29,12 +30,32 @@ variant set_group(variant s)
     return VARIANT_EMPTY;
 }
 
+variant do_debug(variant i, variant s)
+{
+    if(get_core_debug_level_env()>=variant_as_int(i) &&
+       (is_core_debug_group(DEBUG_GROUP_ALL) ||
+        is_core_debug_group(core_debug_group)))
+    {
+        printf("%s \n",variant_to_string(s));
+    };
+    return VARIANT_EMPTY;
+}
+
 DEFINE_PY_FUNCTION(set_debug_level, set_level, 1, desc)
 DEFINE_PY_FUNCTION(set_debug_group, set_group, 1, desc)
+DEFINE_PY_FUNCTION(debug, do_debug, 2, desc)
 
 START_PY_MODULE(core, Module for Arnovich Core)
     ADD_PY_FUNCTION(set_debug_level)
     ADD_PY_FUNCTION(set_debug_group)
+    ADD_PY_FUNCTION(debug)
     ADD_PY_EXCEPTION(CoreError)
+    ADD_PY_CONSTANT(DEBUG_OFF,DEBUG_OFF)
+    ADD_PY_CONSTANT(DEBUG_ERROR,DEBUG_ERROR)
+    ADD_PY_CONSTANT(DEBUG_LOW,DEBUG_LOW)
+    ADD_PY_CONSTANT(DEBUG_MEDIUM,DEBUG_MEDIUM)
+    ADD_PY_CONSTANT(DEBUG_HIGH,DEBUG_HIGH)
+    ADD_PY_CONSTANT(DEBUG_PRETTYHIGH,DEBUG_PRETTYHIGH)
+    ADD_PY_CONSTANT(DEBUG_HIGHEST,DEBUG_HIGHEST)
 END_PY_MODULE
 

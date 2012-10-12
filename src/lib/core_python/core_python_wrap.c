@@ -40,7 +40,7 @@ static char* variant_error_msg(char* str)
 // simple function with no python state 
 PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_error_function err, void *self)
 {
-    if((args && (PyTuple_Size(args) != nargs)) || (nargs != 0))
+    if((args && (PyTuple_Size(args) != nargs)) || (!args && (nargs != 0)))
     {
         PyErr_Format(PyExc_StandardError, "Wrong number of arguments: expected %i got %i", nargs, (int)PyTuple_Size(args));
         return NULL;

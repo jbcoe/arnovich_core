@@ -20,7 +20,11 @@ struct Generic_Py_Struct
 	static py_error_function NAME##_error = NULL; \
     static PyObject* PyFunc_##NAME(PyObject* self, PyObject* args) \
     { \
-        return python_wrap_function(args, NARGS, (void*)FUNCTION, NAME##_error, ((struct Generic_Py_Struct*)self)->m_data); \
+	    if(self) \
+        { \
+            return python_wrap_function(args, NARGS, (void*)FUNCTION, NAME##_error, ((struct Generic_Py_Struct*)self)->m_data); \
+        } \
+        return python_wrap_function(args, NARGS, (void*)FUNCTION, NAME##_error, NULL); \
     }\
     static char NAME##_name[] = #NAME; \
     static char NAME##_description[] = #DESCRIPTION;
@@ -43,7 +47,7 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
             typedef variant (*wrapped_function5)(variant, variant, variant, variant, variant); \
             va_list vl; \
             va_start(vl, self); \
-            variant rtn; \
+            variant rtn;\
             void* func = FUNCTION; \
             switch(NARGS) \
             { \
@@ -51,30 +55,45 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
                 rtn = ((wrapped_function0)func)(); \
                 break; \
             case 1: \
-                rtn = ((wrapped_function1)func)(va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                rtn = ((wrapped_function1)func)(v1); \
                 break; \
+            } \
             case 2: \
-                rtn = ((wrapped_function2)func)(va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                rtn = ((wrapped_function2)func)(v1, v2);\
                 break; \
+            } \
             case 3: \
-                rtn = ((wrapped_function3)func)(va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                variant v3 = va_arg(vl,variant); \
+                rtn = ((wrapped_function3)func)(v1, v2, v3);\
                 break; \
+            } \
             case 4: \
-                rtn = ((wrapped_function4)func)(va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                variant v3 = va_arg(vl,variant); \
+                variant v4 = va_arg(vl,variant); \
+                rtn = ((wrapped_function4)func)(v1, v2, v3, v4);\
                 break; \
+            } \
             case 5: \
-                rtn = ((wrapped_function5)func)(va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                variant v3 = va_arg(vl,variant); \
+                variant v4 = va_arg(vl,variant); \
+                variant v5 = va_arg(vl,variant); \
+                rtn = ((wrapped_function5)func)(v1, v2, v3, v4, v5);\
                 break; \
+            } \
             default: \
                 break; \
             } \
@@ -103,35 +122,45 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
                 rtn = ((wrapped_function0)func)(slf); \
                 break; \
             case 1: \
-                rtn = ((wrapped_function1)func)(slf, \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                rtn = ((wrapped_function1)func)(slf, v1); \
                 break; \
+            } \
             case 2: \
-                rtn = ((wrapped_function2)func)(slf, \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                rtn = ((wrapped_function2)func)(slf, v1, v2);\
                 break; \
+            } \
             case 3: \
-                rtn = ((wrapped_function3)func)(slf, \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                variant v3 = va_arg(vl,variant); \
+                rtn = ((wrapped_function3)func)(slf, v1, v2, v3);\
                 break; \
+            } \
             case 4: \
-                rtn = ((wrapped_function4)func)(slf, \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                variant v3 = va_arg(vl,variant); \
+                variant v4 = va_arg(vl,variant); \
+                rtn = ((wrapped_function4)func)(slf, v1, v2, v3, v4);\
                 break; \
+            } \
             case 5: \
-                rtn = ((wrapped_function5)func)(slf, \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant), \
-                                                va_arg(vl,variant)); \
+            { \
+                variant v1 = va_arg(vl,variant); \
+                variant v2 = va_arg(vl,variant); \
+                variant v3 = va_arg(vl,variant); \
+                variant v4 = va_arg(vl,variant); \
+                variant v5 = va_arg(vl,variant); \
+                rtn = ((wrapped_function5)func)(slf, v1, v2, v3, v4, v5);\
                 break; \
+            } \
             default: \
                 rtn = VARIANT_EMPTY; \
                 break; \
@@ -237,10 +266,16 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
     static PyMethodDef *NAME##_methods = NULL; \
     static size_t NAME##_nmethods = 0; \
     static size_t NAME##_nobjects = 0; \
+    static struct PyConstants { \
+                    char*   m_name; \
+                    long    m_value; \
+                  } *NAME##_constants = NULL; \
+    static size_t NAME##_nconstants = 0; \
     static void NAME##_at_exit() \
     { \
         free(NAME##_methods); \
         free(NAME##_objects); \
+        free(NAME##_constants); \
     } \
     static void Py_add_method(char* name, PyCFunction function, int flags, char* description) \
     { \
@@ -270,6 +305,19 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
         free(m); \
         NAME##_nobjects = NAME##_nobjects + 1; \
     } \
+    static void Py_add_constant(char* name, long value) \
+    { \
+        struct PyConstants *m = NAME##_constants; \
+        NAME##_constants = (struct PyConstants*)malloc((NAME##_nconstants+1)*sizeof(struct PyConstants)); \
+        if(m) \
+        { \
+            memcpy(NAME##_constants+1, m, NAME##_nconstants*sizeof(struct PyConstants)); \
+        } \
+        NAME##_constants[0].m_name = name; \
+        NAME##_constants[0].m_value = value; \
+        free(m); \
+        NAME##_nconstants = NAME##_nconstants + 1; \
+    } \
     int NAME##_error(char* name, char* msg) \
     { \
         int i = 0;\
@@ -292,6 +340,8 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
         char* description = #DESCRIPTION; \
         struct PyObjects **objects = &NAME##_objects; \
         size_t *nobjects = &NAME##_nobjects; \
+        struct PyConstants **constants = &NAME##_constants; \
+        size_t *nconstants = &NAME##_nconstants; \
         PyMethodDef **methods = &NAME##_methods; \
         py_error_function error_func = NAME##_error;
 
@@ -309,6 +359,9 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
 #define ADD_PY_OBJECT(NAME) \
 		Py_add_object(#NAME, NAME##_type());
 
+#define ADD_PY_CONSTANT(NAME, VALUE) \
+        Py_add_constant(#NAME, VALUE);
+
 #define END_PY_MODULE \
         PyObject *module = Py_InitModule3(name, *methods, description); \
         if(module) \
@@ -321,6 +374,10 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
                     Py_INCREF((*objects)[i].m_type); \
                     PyModule_AddObject(module, (*objects)[i].m_name, (PyObject*)(*objects)[i].m_type); \
                 } \
+            } \
+            for(i = 0;i<*nconstants;++i) \
+            { \
+                PyModule_AddIntConstant(module, (*constants)[i].m_name, (*constants)[i].m_value); \
             } \
         } \
     } 
