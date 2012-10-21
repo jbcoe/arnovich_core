@@ -20,9 +20,11 @@ variant core_python_py_to_variant(PyObject* o)
             {
                 return variant_from_int(PyInt_AsLong(p));
             }
+            PyErr_Clear();
+            return variant_from_string(s);
         }
     }
-    if(PyFloat_Check(o))
+    else if(PyFloat_Check(o))
     {
         return variant_from_double(PyFloat_AsDouble(o));
     } else if(PyString_Check(o)) {
@@ -36,23 +38,15 @@ variant core_python_py_to_variant(PyObject* o)
             }
         }
     }
-    if(PyString_Check(o))
-    {
-        char *s = PyString_AsString(o);
-        if(s)
-        {
-            return variant_from_string(s);
-        }
-    }
-    if(PyList_Check(o))
+    else if(PyList_Check(o))
     {
         return variant_from_matrix(core_python_py_to_matrix(o));
     }
-    if(PyDict_Check(o))
+    else if(PyDict_Check(o))
     {
         return variant_from_matrix(core_python_py_to_matrix(o));
     }
-    if(PyBool_Check(o))
+    else if(PyBool_Check(o))
     {
         if(o == Py_True)
         {
