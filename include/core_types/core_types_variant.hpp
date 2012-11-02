@@ -89,11 +89,14 @@ public:
         return variant(CVariant::variant_from_error(const_cast<char*>(s.c_str())));
     }
 private:
-    variant(CVariant::matrix m) : m_v(CVariant::variant_from_matrix(m))
+		//NOTE: this passes on ownership 
+		variant(CVariant::matrix m) : m_v(CVariant::variant_from_matrix(m))
     {
         m_count = new int;
         *m_count = 1;
     }
+public:
+		//NOTE: this does not pass on ownership 
     variant(CVariant::variant v) : m_v(CVariant::variant_copy(v))
     {
         m_count = new int;
@@ -242,6 +245,11 @@ public:
         }
         return 1;
     }
+
+		CVariant::variant to_c() const
+		{
+				return CVariant::variant_copy(m_v);
+		}
 
 private:
     int *m_count;

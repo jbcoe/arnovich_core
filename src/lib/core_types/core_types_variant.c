@@ -475,7 +475,11 @@ int _variant_as_bool(variant v)
     {
         return v.m_v.m_i;
     }
-    return 0;
+		if(CORE_TYPES_VARIANT_INT == v.m_type)
+    {
+        return v.m_v.m_i;
+    }
+   return 0;
 }
 
 double _variant_as_double(variant v)
