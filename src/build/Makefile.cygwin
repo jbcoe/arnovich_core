@@ -39,6 +39,11 @@ ifdef USE_BS
 	LARG += -larnovich_bs
 endif
 
+ifdef USE_SRV
+	CARG += -I ${ARNOVICHLIB}srv/include
+	LARG += -larnovich_srv
+endif
+
 CCARGBIN = $(CARG) $(LARG) -L$(BUILDLIB) -l$(LIBNAME)
 CCARG = $(CARG) -c -fPIC
 LNARG = $(LARG) -Wl,-v -shared

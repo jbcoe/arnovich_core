@@ -45,6 +45,7 @@ variant variant_copy(variant v)
         break;
     case CORE_TYPES_VARIANT_STRING:
     case CORE_TYPES_VARIANT_ERROR:
+				rtn.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(rtn.m_v.m_s.m_l+1));
         strcpy(rtn.m_v.m_s.m_s, v.m_v.m_s.m_s);
         break;
     case CORE_TYPES_VARIANT_MATRIX:
@@ -300,7 +301,7 @@ variant variant_add(variant a, variant b)
         case CORE_TYPES_VARIANT_STRING:
             rtn.m_type = CORE_TYPES_VARIANT_STRING;
             rtn.m_v.m_s.m_l = a.m_v.m_s.m_l+b.m_v.m_s.m_l;
-            rtn.m_v.m_s.m_s = (char*)malloc(sizeof(char)*rtn.m_v.m_s.m_l);
+            rtn.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(rtn.m_v.m_s.m_l+1));
             strcpy(rtn.m_v.m_s.m_s, a.m_v.m_s.m_s);
             strcat(rtn.m_v.m_s.m_s, b.m_v.m_s.m_s);
             break;
