@@ -1,6 +1,6 @@
 
 
-MACPORTS ?= 0
+MACPORTS ?= 1
 
 # OSX build
 BUILDLIB=/usr/lib/
