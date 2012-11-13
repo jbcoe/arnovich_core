@@ -22,6 +22,19 @@ extern "C"
 
 class variant
 {
+	void release()
+	{
+		if(m_count)
+		{
+			--(*m_count);
+			if(!(*m_count))
+			{
+				delete m_count;
+				variant_free(m_v);
+			}
+		}
+	}
+ 
 public:
     variant() : m_v(CVariant::VARIANT_EMPTY())
     {
@@ -36,6 +49,7 @@ public:
     }
     const variant& operator=(const variant& v)
     {
+				release();
         m_count = v.m_count;
         m_v = v.m_v;
         ++(*m_count);
@@ -43,15 +57,7 @@ public:
     }
     ~variant()
     {
-        if(m_count)
-        {
-            --(*m_count);
-            if(!(*m_count))
-            {
-                delete m_count;
-                variant_free(m_v);
-            }
-        }
+			release();
     }
 
     variant(bool b) : m_v(CVariant::_variant_from_bool((int)b))
@@ -78,7 +84,7 @@ public:
         *m_count = 1;
     }
     
-    variant(unsigned int rows, unsigned int cols) : m_v(CVariant::variant_from_matrix(CVariant::matrix_init(cols, rows)))
+    variant(unsigned int rows, unsigned int cols) : m_v(CVariant::variant_matrix(CVariant::matrix_init(cols, rows)))
     {
         m_count = new int;
         *m_count = 1;
@@ -90,7 +96,7 @@ public:
     }
 private:
 		//NOTE: this passes on ownership 
-		variant(CVariant::matrix m) : m_v(CVariant::variant_from_matrix(m))
+		variant(CVariant::matrix m) : m_v(CVariant::variant_matrix(m))
     {
         m_count = new int;
         *m_count = 1;
