@@ -28,6 +28,7 @@ SRCLIB=src/lib/
 SRCBINLIB=src/bin/
 SRCTESTLIB=test/
 SRCPYLIB=src/pylib/
+SRCPYMODULES=src/py/
 TMPLIB=$(BUILDDIR)/
 TMPLIBPY=$(TMPLIB)/pylib/
 ARNOVICHLIB ?= ../
@@ -159,6 +160,7 @@ docs:
 .PHONY: pylib
 pylib:
 	mkdir -p $(TMPLIBPY)/arnovich/
+	if [ -d $(SRCPYMODULES) ]; then cp -r ${SRCPYMODULES} $(TMPLIBPY)/arnovich/ ; fi
 	touch $(TMPLIBPY)/arnovich/__init__.py
 	${ECHO_CMD} '\nfrom arnovich._$(NAME) import *\n' > $(TMPLIBPY)/arnovich/$(NAME).py
 	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --files $(SRCPYFILES)
