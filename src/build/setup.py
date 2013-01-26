@@ -1,5 +1,5 @@
 from distutils.core import setup, Extension
-import sys
+import sys, os
 
 name = None
 isname = False
@@ -35,9 +35,6 @@ for arg in sys.argv[1:]:
         isminorv = False
         minorv = arg
         sys.argv.remove(arg)
-    elif arg == "--files":
-        isfiles = True
-        sys.argv.remove(arg)
     elif arg == "--builddir":
         isbuilddir = True
         sys.argv.remove(arg)
@@ -51,6 +48,9 @@ for arg in sys.argv[1:]:
     elif arg == "--use_math":
         use_math = True
         sys.argv.remove(arg)
+    elif arg == "--files":
+        isfiles = True
+        sys.argv.remove(arg)
     elif isfiles == True:
         files.append(arg)
         sys.argv.remove(arg)
@@ -58,6 +58,15 @@ for arg in sys.argv[1:]:
 if (name == None) or (majorv == None) or (minorv == None) or (builddir == None):
     raise Exception("problem....")
 # if no _ in name then throw
+
+package_dir = 'build/pylib'
+package = 'arnovich'
+packages = [package]
+for direc in os.listdir(os.path.join(package_dir, package)):
+    if os.path.isdir(os.path.join(package_dir, package, direc)):
+        packages.append(package + "." + direc)
+
+print "packages:" + str(packages)
 
 libname = name
 dotname = name.replace('_','.')
@@ -82,7 +91,7 @@ setup (name = dotname,
        version = majorv+'.'+minorv,
        author = 'arnovich',
        package_dir = {'': 'build/pylib'},
-       packages = ['arnovich'],
+       packages = packages,
        ext_package = 'arnovich',
        ext_modules = [module1])
 
