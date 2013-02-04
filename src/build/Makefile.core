@@ -162,7 +162,7 @@ pylib:
 	mkdir -p $(TMPLIBPY)/arnovich/
 	touch $(TMPLIBPY)/arnovich/__init__.py
 	${ECHO_CMD} '\nfrom arnovich._$(NAME) import *\n' > $(TMPLIBPY)/arnovich/$(NAME).py
-	if [ -d $(SRCPYMODULES) ]; then cp -r ${SRCPYMODULES} $(TMPLIBPY)/arnovich/ ; fi
+	if [ -d $(SRCPYMODULES) ]; then cp -r ${SRCPYMODULES}/* $(TMPLIBPY)/arnovich/ ; fi
 	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --files $(SRCPYFILES)
 	$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --files $(SRCPYFILES)
 
