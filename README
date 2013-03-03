@@ -8,9 +8,7 @@ Library for shared common functionality across all Arnovich projects.
 #### TODO ####
 
 - fix debug call: should move out of header
-- add static/macro variant_ok error
-- serialisation of variant type(to_/from_string)
-- python wrapper macros: for python objects/types
+- move serialisation of variant here from LCL
 
 #### HOW TO BUILD ####
 

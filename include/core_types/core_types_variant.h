@@ -25,14 +25,6 @@ typedef enum
     CORE_TYPES_VARIANT_ERROR     = 6,
 } CORE_TYPES_VARIANT_TYPE;
 
-
-//TODO for starters only int and double
-//TODO should also support string and matrices
-//TODO maybe also an exception/null object
-//TODO then to_python returns a NULL plus sets the string value as an exception
-//TODO so in the python layer just do return to_python(result)
-//TODO then we can easily generate python wrappers for functions taking only variants as arguments
-
 struct core_types_variant
 {
     CORE_TYPES_VARIANT_TYPE m_type;

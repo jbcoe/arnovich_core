@@ -336,7 +336,6 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
         Py_AtExit(NAME##_at_exit); \
         Py_add_method(NULL, NULL, 0, NULL); \
         char* name = "arnovich._"#NAME; \
-        char* expname = "arnovich."#NAME; \
         char* description = #DESCRIPTION; \
         struct PyObjects **objects = &NAME##_objects; \
         size_t *nobjects = &NAME##_nobjects; \
@@ -349,12 +348,10 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
         NAME##_error = error_func; \
         Py_add_method(NAME##_name,  PyFunc_##NAME, METH_VARARGS, NAME##_description);
 
-#define ADD_PY_EXCEPTION(NAME) \
-		char *exp_##NAME = (char*)malloc(strlen(name)+strlen(#NAME)+2); \
-		strcpy(exp_##NAME, expname); \
-		strcat(exp_##NAME, "."#NAME); \
-		Py_add_object(#NAME, (PyTypeObject*)PyErr_NewException(exp_##NAME, PyExc_StandardError, NULL)); \
-		free(exp_##NAME);
+#define ADD_PY_EXCEPTION(NAME,OBJ) \
+        OBJ = PyErr_NewException(#NAME, PyExc_StandardError, NULL); \
+        Py_INCREF(OBJ); \
+        Py_add_object(#NAME, (PyTypeObject*)OBJ);
 
 #define ADD_PY_OBJECT(NAME) \
 		Py_add_object(#NAME, NAME##_type());

@@ -150,7 +150,7 @@ void matrix_replace_row(matrix a, int row1, matrix b, int row2)
     n = (a.m_width > b.m_width)?b.m_width:a.m_width;
     for(i=0; i<n; ++i)
     {
-        matrix_set(a, i, row1, matrix_get(b, i, row2)) 
+        matrix_set(a, i, row1, matrix_get(b, i, row2));
     }
 }
 

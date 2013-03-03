@@ -29,6 +29,7 @@ void variant_free(variant v)
         break;
     case CORE_TYPES_VARIANT_MATRIX:
         matrix_free(v.m_v.m_m);
+        break;
     default:
         break;
     }
@@ -50,6 +51,7 @@ variant variant_copy(variant v)
         break;
     case CORE_TYPES_VARIANT_MATRIX:
         rtn.m_v.m_m = matrix_copy(v.m_v.m_m);
+        break;
     default:
         break;
     }
