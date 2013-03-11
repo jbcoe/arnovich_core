@@ -59,12 +59,17 @@ if (name == None) or (majorv == None) or (minorv == None) or (builddir == None):
     raise Exception("problem....")
 # if no _ in name then throw
 
+
+def define_packages(package, package_dir):
+    packages = [package]
+    for d in os.listdir(package_dir):
+        if os.path.isdir(os.path.join(package_dir, d)):
+            packages.extend(define_packages(package + "." + d, os.path.join(package_dir, d)))
+    return packages
+
 package_dir = 'build/pylib'
 package = 'arnovich'
-packages = [package]
-for direc in os.listdir(os.path.join(package_dir, package)):
-    if os.path.isdir(os.path.join(package_dir, package, direc)):
-        packages.append(package + "." + direc)
+packages = define_packages(package, os.path.join(package_dir, package))
 
 print "packages:" + str(packages)
 
