@@ -51,6 +51,8 @@ SRCTESTFILES += $(foreach dir,$(SRCTESTDIRS),$(wildcard $(dir)/*.cpp))
 SRCPYDIRS = $(wildcard $(SRCPYLIB)*) ./$(SRCPYLIB)
 SRCPYFILES := $(foreach dir,$(SRCPYDIRS),$(wildcard $(dir)/*.c))
 SRCPYFILES += $(foreach dir,$(SRCPYDIRS),$(wildcard $(dir)/*.cpp))
+SRCPYMODULESDIRS = $(wildcard $(SRCPYMODULES)*) ./$(SRCPYMODULES)
+SRCPYDATAFILES := $(foreach dir,$(SRCPYMODULESDIRS),$(wildcard $(dir)/*.xsl))
 
 # dependencies and objects
 BUILDEXT = $(BUILD).DEBUG$(DEBUG)
@@ -163,8 +165,8 @@ pylib:
 	touch $(TMPLIBPY)/arnovich/__init__.py
 	${ECHO_CMD} '\nfrom arnovich._$(NAME) import *\n' > $(TMPLIBPY)/arnovich/$(NAME).py
 	if [ -d $(SRCPYMODULES) ]; then cp -r ${SRCPYMODULES}/* $(TMPLIBPY)/arnovich/ ; fi
-	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --files $(SRCPYFILES)
-	$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --files $(SRCPYFILES)
+	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_EXT) $(PYLIB_ARGS) --datafiles $(SRCPYDATAFILES) --files $(SRCPYFILES)
+	$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --datafiles $(SRCPYDATAFILES) --files $(SRCPYFILES)
 
 clean:
 	rm -rf $(BUILDDIR)

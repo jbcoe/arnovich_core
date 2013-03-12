@@ -9,6 +9,8 @@ minorv = None
 isminorv = False
 isfiles = False
 files = []
+isdatafiles = False
+datafiles = []
 isbuilddir = False
 builddir = None
 use_core = False
@@ -54,6 +56,13 @@ for arg in sys.argv[1:]:
     elif isfiles == True:
         files.append(arg)
         sys.argv.remove(arg)
+    elif arg == "--datafiles":
+        isdatafiles = True
+        sys.argv.remove(arg)
+    elif isdatafiles == True:
+        datafiles.append(arg)
+        sys.argv.remove(arg)
+        isdatafiles = False
 
 if (name == None) or (majorv == None) or (minorv == None) or (builddir == None):
     raise Exception("problem....")
@@ -70,8 +79,10 @@ def define_packages(package, package_dir):
 package_dir = 'build/pylib'
 package = 'arnovich'
 packages = define_packages(package, os.path.join(package_dir, package))
+data_files = [(os.path.join(package, 'etc'), datafiles)]
 
 print "packages:" + str(packages)
+print "datafiles:" + str(datafiles)
 
 libname = name
 dotname = name.replace('_','.')
@@ -98,5 +109,6 @@ setup (name = dotname,
        package_dir = {'': 'build/pylib'},
        packages = packages,
        ext_package = 'arnovich',
-       ext_modules = [module1])
+       ext_modules = [module1],
+       data_files = data_files)
 
