@@ -25,4 +25,6 @@ matrix core_python_py_to_matrix(PyObject*);
 
 PyObject* core_python_matrix_to_py(matrix);
 
+PyObject* core_python_variants_to_py_dict(variant, variant);
+
 #endif /* CORE_PYTHON_H_ */

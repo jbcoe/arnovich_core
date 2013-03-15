@@ -186,3 +186,29 @@ PyObject* core_python_matrix_to_py(matrix m)
     return rows;
 }
 
+PyObject* core_python_variants_to_py_dict(variant vars, variant vals)
+{
+    if(variant_is_matrix(vars) && variant_is_matrix(vals))
+    {
+        matrix m1 = variant_as_matrix(vars);
+        matrix m2 = variant_as_matrix(vals);
+
+        int n = m1.m_height;
+        if(n != m2.m_height) return NULL;
+
+        PyObject* rtn = PyDict_New();
+        int i = 0;
+        for(; i<n; ++i)
+        {
+            PyDict_SetItem(rtn, 
+                           core_python_variant_to_py(matrix_get(m1, 0, i)),
+                           core_python_variant_to_py(matrix_get(m2, 0, i))
+                          );
+        }
+
+        return rtn;
+    }
+
+    return NULL;
+}
+
