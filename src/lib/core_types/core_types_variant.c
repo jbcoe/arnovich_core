@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdarg.h>
 
 #define STRING_LENGTH 1000
 
@@ -22,6 +23,7 @@ void variant_free(variant v)
     case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_INT:
     case CORE_TYPES_VARIANT_DOUBLE:
+    case CORE_TYPES_VARIANT_FUNCTION:
         break;
     case CORE_TYPES_VARIANT_STRING:
     case CORE_TYPES_VARIANT_ERROR:
@@ -43,6 +45,7 @@ variant variant_copy(variant v)
     case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_INT:
     case CORE_TYPES_VARIANT_DOUBLE:
+    case CORE_TYPES_VARIANT_FUNCTION:
         break;
     case CORE_TYPES_VARIANT_STRING:
     case CORE_TYPES_VARIANT_ERROR:
@@ -87,6 +90,9 @@ char* variant_to_string(variant v)
         break;
     case CORE_TYPES_VARIANT_MATRIX:
         return matrix_to_string(v.m_v.m_m);
+    case CORE_TYPES_VARIANT_FUNCTION:
+        sprintf(str, "Function: %i params", v.m_v.m_f.m_n);
+        break;
     default:
         strcpy(str, "");
         break;
@@ -104,6 +110,7 @@ char* variant_to_string_(variant v)
     case CORE_TYPES_VARIANT_INT:
     case CORE_TYPES_VARIANT_DOUBLE:
     case CORE_TYPES_VARIANT_MATRIX:
+    case CORE_TYPES_VARIANT_FUNCTION:
     default:
         break;
     }
@@ -173,6 +180,15 @@ int variant_equal(variant a, variant b)
                 break;
         }
         break;
+    case CORE_TYPES_VARIANT_FUNCTION:
+        switch(b.m_type)
+        {
+            case CORE_TYPES_VARIANT_FUNCTION:
+                return (a.m_v.m_f.m_n == b.m_v.m_f.m_n) && (a.m_v.m_f.m_f == b.m_v.m_f.m_f);
+            default:
+                break;
+        }
+        break;
     default:
         break;
     }
@@ -216,6 +232,7 @@ int variant_less(variant a, variant b)
         break;
     case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_ERROR:
+    case CORE_TYPES_VARIANT_FUNCTION:
         break;
     case CORE_TYPES_VARIANT_MATRIX:
         //TODO
@@ -313,6 +330,7 @@ variant variant_add(variant a, variant b)
         break;
     case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_ERROR:
+    case CORE_TYPES_VARIANT_FUNCTION:
         break;
     case CORE_TYPES_VARIANT_MATRIX:
         //TODO
@@ -361,6 +379,7 @@ variant variant_multiply(variant a, variant b)
     case CORE_TYPES_VARIANT_STRING:
     case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_ERROR:
+    case CORE_TYPES_VARIANT_FUNCTION:
         break;
     case CORE_TYPES_VARIANT_MATRIX:
         //TODO
@@ -368,6 +387,86 @@ variant variant_multiply(variant a, variant b)
     default:
         break;
     }
+    return rtn;
+}
+
+typedef variant (*variant_function0)();
+typedef variant (*variant_function1)(variant);
+typedef variant (*variant_function2)(variant, variant);
+typedef variant (*variant_function3)(variant, variant, variant);
+typedef variant (*variant_function4)(variant, variant, variant, variant);
+typedef variant (*variant_function5)(variant, variant, variant, variant, variant);
+
+static variant _variant_call(variant f, va_list vl)
+{
+    if(!variant_is_function(f))
+    {
+        return variant_from_error("cannot call on a non-function variant");
+    }
+
+    variant rtn;
+    switch(f.m_v.m_f.m_n)
+    {
+        case 0:
+        {
+            rtn = ((variant_function0)f.m_v.m_f.m_f)();
+            break;
+        }
+        case 1:
+        {
+            variant v1 = va_arg(vl, variant);
+            rtn = ((variant_function1)f.m_v.m_f.m_f)(v1);
+            break;
+        }
+        case 2:
+        {
+            variant v1 = va_arg(vl, variant);
+            variant v2 = va_arg(vl, variant);
+            rtn = ((variant_function2)f.m_v.m_f.m_f)(v1, v2);
+            break;
+        }
+        case 3:
+        {
+            variant v1 = va_arg(vl, variant);
+            variant v2 = va_arg(vl, variant);
+            variant v3 = va_arg(vl, variant);
+            rtn = ((variant_function3)f.m_v.m_f.m_f)(v1, v2, v3);
+            break;
+        }
+        case 4:
+        {
+            variant v1 = va_arg(vl, variant);
+            variant v2 = va_arg(vl, variant);
+            variant v3 = va_arg(vl, variant);
+            variant v4 = va_arg(vl, variant);
+            rtn = ((variant_function4)f.m_v.m_f.m_f)(v1, v2, v3, v4);
+            break;
+        }
+        case 5:
+        {
+            variant v1 = va_arg(vl, variant);
+            variant v2 = va_arg(vl, variant);
+            variant v3 = va_arg(vl, variant);
+            variant v4 = va_arg(vl, variant);
+            variant v5 = va_arg(vl, variant);
+            rtn = ((variant_function5)f.m_v.m_f.m_f)(v1, v2, v3, v4, v5);
+            break;
+        }
+        default:
+        {
+            return variant_from_error("un-supported number of arguments");
+        }
+    }
+    return rtn;
+}
+
+variant variant_call(variant f, ...)
+{
+    va_list vl;
+    va_start(vl, f);
+    variant rtn;
+    rtn = _variant_call(f, vl);
+    va_end(vl);
     return rtn;
 }
 
@@ -392,6 +491,15 @@ variant _variant_from_int(int i)
     variant v;
     v.m_type = CORE_TYPES_VARIANT_INT;
     v.m_v.m_i = i;
+    return v;
+}
+
+variant _variant_from_function(void* f, int n)
+{
+    variant v;
+    v.m_type = CORE_TYPES_VARIANT_FUNCTION;
+    v.m_v.m_f.m_f = f;
+    v.m_v.m_f.m_n = n;
     return v;
 }
 
@@ -546,3 +654,7 @@ int _variant_is_matrix(variant v)
     return (CORE_TYPES_VARIANT_MATRIX == v.m_type);
 }
 
+int _variant_is_function(variant v)
+{
+    return (CORE_TYPES_VARIANT_FUNCTION == v.m_type);
+}

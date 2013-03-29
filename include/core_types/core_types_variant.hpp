@@ -8,6 +8,7 @@
 #define CORE_TYPES_VARIANT_HPP
 
 #include <string>
+#include <stdarg.h>
 
 namespace CVariant
 {
@@ -90,19 +91,25 @@ public:
         *m_count = 1;
     }
 
+    variant(void* f, int n) : m_v(CVariant::_variant_from_function(f, n))
+    {
+        m_count = new int;
+        *m_count = 1;        
+    }
+
     static variant from_error(const std::string& s)
     {
         return variant(CVariant::variant_from_error(const_cast<char*>(s.c_str())));
     }
 private:
-		//NOTE: this passes on ownership 
-		variant(CVariant::matrix m) : m_v(CVariant::variant_matrix(m))
+	//NOTE: this passes on ownership 
+	variant(CVariant::matrix m) : m_v(CVariant::variant_matrix(m))
     {
         m_count = new int;
         *m_count = 1;
     }
 public:
-		//NOTE: this does not pass on ownership 
+	//NOTE: this does not pass on ownership 
     variant(CVariant::variant v) : m_v(CVariant::variant_copy(v))
     {
         m_count = new int;
@@ -132,6 +139,54 @@ public:
     operator CVariant::matrix() const
     {
         return CVariant::variant_as_matrix(m_v);
+    }
+
+    variant call()
+    {
+        CVariant::variant crtn = CVariant::variant_call(m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
+    }
+
+    variant call(variant v1)
+    {
+        CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
+    }
+
+    variant call(variant v1, variant v2)
+    {
+        CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
+    }
+
+    variant call(variant v1, variant v2, variant v3)
+    {
+        CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v, v3.m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
+    }
+
+    variant call(variant v1, variant v2, variant v3, variant v4)
+    {
+        CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v, v3.m_v, v4.m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
+    }
+
+    variant call(variant v1, variant v2, variant v3, variant v4, variant v5)
+    {
+        CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v, v3.m_v, v4.m_v, v5.m_v);
+        variant rtn(crtn);
+        CVariant::variant_free(crtn);
+        return rtn;
     }
 
     bool is_empty() const
@@ -167,6 +222,11 @@ public:
     bool is_matrix() const
     {
         return CVariant::_variant_is_matrix(m_v);
+    }
+
+    bool is_function() const
+    {
+        return CVariant::_variant_is_function(m_v);
     }
 
     bool operator ==(const variant& v) const
@@ -210,7 +270,6 @@ public:
         return rtn;
     }
 
-
     std::string to_string() const
     {
         return std::string(CVariant::variant_to_string_(m_v));
@@ -252,10 +311,10 @@ public:
         return 1;
     }
 
-		CVariant::variant to_c() const
-		{
-				return CVariant::variant_copy(m_v);
-		}
+	CVariant::variant to_c() const
+	{
+			return CVariant::variant_copy(m_v);
+	}
 
 private:
     int *m_count;

@@ -23,6 +23,7 @@ typedef enum
     CORE_TYPES_VARIANT_STRING    = 4,
     CORE_TYPES_VARIANT_MATRIX    = 5,
     CORE_TYPES_VARIANT_ERROR     = 6,
+    CORE_TYPES_VARIANT_FUNCTION  = 7
 } CORE_TYPES_VARIANT_TYPE;
 
 struct core_types_variant
@@ -34,6 +35,7 @@ struct core_types_variant
         double                           m_d;
         struct { char *m_s; int m_l; }   m_s;
         matrix                           m_m;
+        struct { int m_n; void* m_f; }   m_f;
     } m_v;
 };
 typedef struct core_types_variant variant;
@@ -61,6 +63,7 @@ int variant_or(variant a, variant b);
 variant variant_add(variant a, variant b);
 variant variant_multiply(variant a, variant b);
 
+variant variant_call(variant f, ...);
 
 variant variant_from_string(char* c);
 
@@ -93,6 +96,8 @@ matrix variant_as_matrix(variant v);
 
 #define variant_from_double(d) (variant){CORE_TYPES_VARIANT_DOUBLE, {.m_d=d}}
 
+#define variant_from_function(f, n) (variant){CORE_TYPES_VARIANT_FUNCTION, {.m_f.m_n=n,.m_f.m_f=f}}
+
 #define variant_as_bool(v) ((CORE_TYPES_VARIANT_BOOL == v.m_type)?v.m_v.m_i:((CORE_TYPES_VARIANT_INT == v.m_type)?v.m_v.m_i:0))
 
 #define variant_as_int(v) ((CORE_TYPES_VARIANT_INT == v.m_type)?v.m_v.m_i:((CORE_TYPES_VARIANT_DOUBLE == v.m_type)?((int)v.m_v.m_i):0))
@@ -113,6 +118,8 @@ matrix variant_as_matrix(variant v);
 
 #define variant_is_matrix(v) (CORE_TYPES_VARIANT_MATRIX == v.m_type)
 
+#define variant_is_function(v) (CORE_TYPES_VARIANT_FUNCTION == v.m_type)
+
 #else
 
 variant _variant_empty();
@@ -129,6 +136,9 @@ variant _variant_from_bool(int b);
 
 variant _variant_from_int(int i);
 #define variant_from_int(i) _variant_from_int(i)
+
+variant _variant_from_function(void* f, int n);
+#define variant_from_function(f, n) _variant_from_funcion(f, n)
 
 int _variant_as_bool(variant v);
 #define variant_as_bool(v) _variant_as_bool(v)
@@ -159,6 +169,9 @@ int _variant_is_error(variant v);
 
 int _variant_is_matrix(variant v);
 #define variant_is_matrix(v) _variant_is_matrix(v)
+
+int _variant_is_function(variant v);
+#define variant_is_function(v) _variant_is_function(v)
 
 #endif
 
