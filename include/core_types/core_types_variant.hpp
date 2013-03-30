@@ -91,7 +91,13 @@ public:
         *m_count = 1;
     }
 
-    variant(void* f, int n) : m_v(CVariant::_variant_from_function(f, n))
+    variant(void* f, int n) : m_v(CVariant::_variant_from_function(f, 0, n))
+    {
+        m_count = new int;
+        *m_count = 1;        
+    }
+
+    variant(void* f, void* a, int n) : m_v(CVariant::_variant_from_function(f, a, n))
     {
         m_count = new int;
         *m_count = 1;        
@@ -141,48 +147,60 @@ public:
         return CVariant::variant_as_matrix(m_v);
     }
 
-    variant call()
+    variant call() const
     {
+        if(CVariant::variant_params(m_v) != 0)
+            return variant::from_error("wrong number of arguments");
         CVariant::variant crtn = CVariant::variant_call(m_v);
         variant rtn(crtn);
         CVariant::variant_free(crtn);
         return rtn;
     }
 
-    variant call(variant v1)
+    variant call(variant v1) const
     {
+        if(CVariant::variant_params(m_v) != 1)
+            return variant::from_error("wrong number of arguments");
         CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v);
         variant rtn(crtn);
         CVariant::variant_free(crtn);
         return rtn;
     }
 
-    variant call(variant v1, variant v2)
+    variant call(variant v1, variant v2) const
     {
+        if(CVariant::variant_params(m_v) != 2)
+            return variant::from_error("wrong number of arguments");
         CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v);
         variant rtn(crtn);
         CVariant::variant_free(crtn);
         return rtn;
     }
 
-    variant call(variant v1, variant v2, variant v3)
+    variant call(variant v1, variant v2, variant v3) const
     {
+        if(CVariant::variant_params(m_v) != 3)
+            return variant::from_error("wrong number of arguments");
         CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v, v3.m_v);
         variant rtn(crtn);
         CVariant::variant_free(crtn);
         return rtn;
     }
 
-    variant call(variant v1, variant v2, variant v3, variant v4)
+    variant call(variant v1, variant v2, variant v3, variant v4) const
     {
+        if(CVariant::variant_params(m_v) != 4)
+            return variant::from_error("wrong number of arguments");
         CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v, v3.m_v, v4.m_v);
         variant rtn(crtn);
         CVariant::variant_free(crtn);
         return rtn;
     }
 
-    variant call(variant v1, variant v2, variant v3, variant v4, variant v5)
+    variant call(variant v1, variant v2, variant v3, variant v4, variant v5) const
     {
+        if(CVariant::variant_params(m_v) != 5)
+            return variant::from_error("wrong number of arguments");
         CVariant::variant crtn = CVariant::variant_call(m_v, v1.m_v, v2.m_v, v3.m_v, v4.m_v, v5.m_v);
         variant rtn(crtn);
         CVariant::variant_free(crtn);

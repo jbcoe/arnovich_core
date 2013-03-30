@@ -23,7 +23,6 @@ void variant_free(variant v)
     case CORE_TYPES_VARIANT_BOOL:
     case CORE_TYPES_VARIANT_INT:
     case CORE_TYPES_VARIANT_DOUBLE:
-    case CORE_TYPES_VARIANT_FUNCTION:
         break;
     case CORE_TYPES_VARIANT_STRING:
     case CORE_TYPES_VARIANT_ERROR:
@@ -31,6 +30,9 @@ void variant_free(variant v)
         break;
     case CORE_TYPES_VARIANT_MATRIX:
         matrix_free(v.m_v.m_m);
+        break;
+    case CORE_TYPES_VARIANT_FUNCTION:
+        //free(v.m_v.m_f.m_a);
         break;
     default:
         break;
@@ -49,7 +51,7 @@ variant variant_copy(variant v)
         break;
     case CORE_TYPES_VARIANT_STRING:
     case CORE_TYPES_VARIANT_ERROR:
-				rtn.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(rtn.m_v.m_s.m_l+1));
+		rtn.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(rtn.m_v.m_s.m_l+1));
         strcpy(rtn.m_v.m_s.m_s, v.m_v.m_s.m_s);
         break;
     case CORE_TYPES_VARIANT_MATRIX:
@@ -391,11 +393,17 @@ variant variant_multiply(variant a, variant b)
 }
 
 typedef variant (*variant_function0)();
+typedef variant (*variant_function_object0)(void*);
 typedef variant (*variant_function1)(variant);
+typedef variant (*variant_function_object1)(void*, variant);
 typedef variant (*variant_function2)(variant, variant);
+typedef variant (*variant_function_object2)(void*, variant, variant);
 typedef variant (*variant_function3)(variant, variant, variant);
+typedef variant (*variant_function_object3)(void*, variant, variant, variant);
 typedef variant (*variant_function4)(variant, variant, variant, variant);
+typedef variant (*variant_function_object4)(void*, variant, variant, variant, variant);
 typedef variant (*variant_function5)(variant, variant, variant, variant, variant);
+typedef variant (*variant_function_object5)(void*, variant, variant, variant, variant, variant);
 
 static variant _variant_call(variant f, va_list vl)
 {
@@ -403,26 +411,41 @@ static variant _variant_call(variant f, va_list vl)
     {
         return variant_from_error("cannot call on a non-function variant");
     }
-
+ 
     variant rtn;
     switch(f.m_v.m_f.m_n)
     {
         case 0:
         {
-            rtn = ((variant_function0)f.m_v.m_f.m_f)();
+            if(f.m_v.m_f.m_a)
+            {
+                rtn = ((variant_function_object0)f.m_v.m_f.m_f)(f.m_v.m_f.m_a);
+            } else {
+                rtn = ((variant_function0)f.m_v.m_f.m_f)();
+            }
             break;
         }
         case 1:
         {
             variant v1 = va_arg(vl, variant);
-            rtn = ((variant_function1)f.m_v.m_f.m_f)(v1);
+            if(f.m_v.m_f.m_a)
+            {
+                rtn = ((variant_function_object1)f.m_v.m_f.m_f)(f.m_v.m_f.m_a, v1);
+            } else {
+                rtn = ((variant_function1)f.m_v.m_f.m_f)(v1);
+            }
             break;
         }
         case 2:
         {
             variant v1 = va_arg(vl, variant);
             variant v2 = va_arg(vl, variant);
-            rtn = ((variant_function2)f.m_v.m_f.m_f)(v1, v2);
+            if(f.m_v.m_f.m_a)
+            {
+                rtn = ((variant_function_object2)f.m_v.m_f.m_f)(f.m_v.m_f.m_a, v1, v2);
+            } else {
+                rtn = ((variant_function2)f.m_v.m_f.m_f)(v1, v2);
+            }
             break;
         }
         case 3:
@@ -430,7 +453,12 @@ static variant _variant_call(variant f, va_list vl)
             variant v1 = va_arg(vl, variant);
             variant v2 = va_arg(vl, variant);
             variant v3 = va_arg(vl, variant);
-            rtn = ((variant_function3)f.m_v.m_f.m_f)(v1, v2, v3);
+            if(f.m_v.m_f.m_a)
+            {
+                rtn = ((variant_function_object3)f.m_v.m_f.m_f)(f.m_v.m_f.m_a, v1, v2, v3);
+            } else {
+                rtn = ((variant_function3)f.m_v.m_f.m_f)(v1, v2, v3);
+            }
             break;
         }
         case 4:
@@ -439,7 +467,12 @@ static variant _variant_call(variant f, va_list vl)
             variant v2 = va_arg(vl, variant);
             variant v3 = va_arg(vl, variant);
             variant v4 = va_arg(vl, variant);
-            rtn = ((variant_function4)f.m_v.m_f.m_f)(v1, v2, v3, v4);
+            if(f.m_v.m_f.m_a)
+            {
+                rtn = ((variant_function_object4)f.m_v.m_f.m_f)(f.m_v.m_f.m_a, v1, v2, v3, v4);
+            } else {
+                rtn = ((variant_function4)f.m_v.m_f.m_f)(v1, v2, v3, v4);
+            }
             break;
         }
         case 5:
@@ -449,7 +482,12 @@ static variant _variant_call(variant f, va_list vl)
             variant v3 = va_arg(vl, variant);
             variant v4 = va_arg(vl, variant);
             variant v5 = va_arg(vl, variant);
-            rtn = ((variant_function5)f.m_v.m_f.m_f)(v1, v2, v3, v4, v5);
+            if(f.m_v.m_f.m_a)
+            {
+                rtn = ((variant_function_object5)f.m_v.m_f.m_f)(f.m_v.m_f.m_a, v1, v2, v3, v4, v5);
+            } else {
+                rtn = ((variant_function5)f.m_v.m_f.m_f)(v1, v2, v3, v4, v5);
+            }
             break;
         }
         default:
@@ -468,6 +506,11 @@ variant variant_call(variant f, ...)
     rtn = _variant_call(f, vl);
     va_end(vl);
     return rtn;
+}
+
+int variant_params(variant f)
+{
+    return f.m_v.m_f.m_n;
 }
 
 variant _variant_from_bool(int b)
@@ -494,11 +537,12 @@ variant _variant_from_int(int i)
     return v;
 }
 
-variant _variant_from_function(void* f, int n)
+variant _variant_from_function(void* f, void* a, int n)
 {
     variant v;
     v.m_type = CORE_TYPES_VARIANT_FUNCTION;
     v.m_v.m_f.m_f = f;
+    v.m_v.m_f.m_a = a;
     v.m_v.m_f.m_n = n;
     return v;
 }

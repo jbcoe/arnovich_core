@@ -211,4 +211,3 @@ PyObject* core_python_variants_to_py_dict(variant vars, variant vals)
 
     return NULL;
 }
-

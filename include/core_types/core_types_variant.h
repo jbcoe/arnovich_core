@@ -31,11 +31,11 @@ struct core_types_variant
     CORE_TYPES_VARIANT_TYPE m_type;
     union
     {
-        int                              m_i;
-        double                           m_d;
-        struct { char *m_s; int m_l; }   m_s;
-        matrix                           m_m;
-        struct { int m_n; void* m_f; }   m_f;
+        int                                         m_i;
+        double                                      m_d;
+        struct { char *m_s; int m_l; }              m_s;
+        matrix                                      m_m;
+        struct { int m_n; void* m_f; void* m_a; }   m_f;
     } m_v;
 };
 typedef struct core_types_variant variant;
@@ -64,6 +64,7 @@ variant variant_add(variant a, variant b);
 variant variant_multiply(variant a, variant b);
 
 variant variant_call(variant f, ...);
+int variant_params(variant f);
 
 variant variant_from_string(char* c);
 
@@ -96,7 +97,9 @@ matrix variant_as_matrix(variant v);
 
 #define variant_from_double(d) (variant){CORE_TYPES_VARIANT_DOUBLE, {.m_d=d}}
 
-#define variant_from_function(f, n) (variant){CORE_TYPES_VARIANT_FUNCTION, {.m_f.m_n=n,.m_f.m_f=f}}
+#define variant_from_function(f, n) (variant){CORE_TYPES_VARIANT_FUNCTION, {.m_f.m_n=n, .m_f.m_a=0, .m_f.m_f=f}}
+
+#define variant_from_function_object(f, a, n) (variant){CORE_TYPES_VARIANT_FUNCTION, {.m_f.m_n=n, .m_f.m_a=a, .m_f.m_f=f}}
 
 #define variant_as_bool(v) ((CORE_TYPES_VARIANT_BOOL == v.m_type)?v.m_v.m_i:((CORE_TYPES_VARIANT_INT == v.m_type)?v.m_v.m_i:0))
 
@@ -137,8 +140,9 @@ variant _variant_from_bool(int b);
 variant _variant_from_int(int i);
 #define variant_from_int(i) _variant_from_int(i)
 
-variant _variant_from_function(void* f, int n);
-#define variant_from_function(f, n) _variant_from_funcion(f, n)
+variant _variant_from_function(void* f, void* a, int n);
+#define variant_from_function(f, n) _variant_from_funcion(f, 0, n)
+#define variant_from_function_object(f, a, n) _variant_from_funcion(f, a, n)
 
 int _variant_as_bool(variant v);
 #define variant_as_bool(v) _variant_as_bool(v)
