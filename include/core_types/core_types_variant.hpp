@@ -50,7 +50,7 @@ public:
     }
     const variant& operator=(const variant& v)
     {
-				release();
+        release();
         m_count = v.m_count;
         m_v = v.m_v;
         ++(*m_count);
@@ -58,7 +58,7 @@ public:
     }
     ~variant()
     {
-			release();
+        release();
     }
 
     variant(bool b) : m_v(CVariant::_variant_from_bool((int)b))
