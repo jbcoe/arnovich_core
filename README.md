@@ -41,3 +41,4 @@ To do a normal build leave out 'clean'.
 To build docs do
     ./mk docs
 
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/9f544152c9bcee0bca43ee9a96ea72e8 "githalytics.com")](http://githalytics.com/arnovich/core)
