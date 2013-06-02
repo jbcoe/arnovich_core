@@ -1,31 +1,42 @@
 
-ARNOVICH CORE LIB
-==================
+ARNOVICH CORE
+==============
 
+This is a simple library for holding some of the common functionality used across my various projects.
+It consists mainly of a few simple types and helpers.
 
-library for common functions and types
+Since anything you put up on Github(or anywhere else) is <a href="http://en.wikipedia.org/wiki/Berne_Convention">by default copyrighted</a> I have added a BSD-3 license, just in case.
+
 
 Features
 --------
+
+Things that you will find here:
+
+* Variant type that can easily be shared and interfaced across C/C++/Python libraries
+* A very simple debug outputter that works across C/C++/Python
+* An even simpler push-pop-notification server for C/Python
 
 
 TODOs
 ------
 
+Things I should really get done
+
 * fix debug call: should move out of header
-* move serialisation of variant here from LCL
-* srv as variant-based
+* move XML serialisation of variant here from LCL
+* server could be variant-based
 
 
 HOW TO BUILD
 -------------
 
-To do a clean build go to the root of the checkout and do
-[sudo] ./mk clean all BUILD=<ARCH>
+For a clean build go to the root of the checkout and do
+    [sudo] ./mk clean all BUILD=[ARCH]
 where ARCH=LINUX64/OSX/CYGWIN/MINGW
 
 To do a normal build leave out 'clean'.
 
 To build docs do
-./mk docs
+    ./mk docs
 
