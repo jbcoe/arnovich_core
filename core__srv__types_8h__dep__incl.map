@@ -1,0 +1,10 @@
+<map id="include/core_srv/core_srv_types.h" name="include/core_srv/core_srv_types.h">
+<area shape="rect" id="node3" href="$core__srv__client_8h.html" title="The client side functionality." alt="" coords="167,97,323,138"/>
+<area shape="rect" id="node9" href="$core__srv__data_8h.html" title="The srv_tick data type and related functions." alt="" coords="347,97,503,138"/>
+<area shape="rect" id="node15" href="$core__srv__server_8h.html" title="The server side functionality." alt="" coords="527,97,683,138"/>
+<area shape="rect" id="node5" href="$core__srv__client_8c.html" title="Implementation file for server client." alt="" coords="5,187,152,229"/>
+<area shape="rect" id="node7" href="$core__srv_8c.html" title="src/pylib/core_srv.c" alt="" coords="177,195,319,221"/>
+<area shape="rect" id="node11" href="$core__srv__data_8c.html" title="Implementation file for data type." alt="" coords="349,187,496,229"/>
+<area shape="rect" id="node13" href="$core__srv__server_8c.html" title="Implementation file for server component." alt="" coords="521,187,668,229"/>
+<area shape="rect" id="node17" href="$core__srv__run_8c.html" title="Simple main function for starting server using local pipes." alt="" coords="693,195,853,221"/>
+</map>

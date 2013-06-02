@@ -1,0 +1,8 @@
+<map id="src/pylib/core_main.c" name="src/pylib/core_main.c">
+<area shape="rect" id="node3" href="$core__python__wrap_8h.html" title="Random collection of Python C&#45;interface macros and helpers." alt="" coords="13,81,197,122"/>
+<area shape="rect" id="node18" href="$core__srv_8h.html" title="core_srv.h" alt="" coords="222,88,308,115"/>
+<area shape="rect" id="node20" href="$core__debug_8h.html" title="This is the C interface for the very simple core debugger." alt="" coords="333,88,520,115"/>
+<area shape="rect" id="node9" href="$core__python_8h.html" title="Python utility functions." alt="" coords="193,171,388,197"/>
+<area shape="rect" id="node11" href="$core__types__variant_8h.html" title="This is the C&#45;interface, and the main functionality, of the variant type." alt="" coords="148,246,313,287"/>
+<area shape="rect" id="node13" href="$core__types__matrix_8h.html" title="Simple 2&#45;dimensional matrix type." alt="" coords="148,337,313,378"/>
+</map>

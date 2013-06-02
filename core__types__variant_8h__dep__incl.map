@@ -1,0 +1,11 @@
+<map id="include/core_types/core_types_variant.h" name="include/core_types/core_types_variant.h">
+<area shape="rect" id="node3" href="$core__python_8h.html" title="Python utility functions." alt="" coords="181,187,331,229"/>
+<area shape="rect" id="node13" href="$core__types__matrix_8h.html" title="Simple 2&#45;dimensional matrix type." alt="" coords="481,97,636,138"/>
+<area shape="rect" id="node17" href="$core__types__variant_8hpp.html" title="C++ interface for the variant type. This is really only a memory manager/smart pointer of the C&#45;versi..." alt="" coords="355,187,529,229"/>
+<area shape="rect" id="node21" href="$core__types__variant_8c.html" title="The implementation of the C&#45;style variant." alt="" coords="733,187,891,229"/>
+<area shape="rect" id="node5" href="$core__python__wrap_8h.html" title="Random collection of Python C&#45;interface macros and helpers." alt="" coords="94,278,247,319"/>
+<area shape="rect" id="node11" href="$core__python_8c.html" title="Implementation of Python utility functions." alt="" coords="272,278,413,319"/>
+<area shape="rect" id="node7" href="$core__python__wrap_8c.html" title="Implementation of various Python helpers." alt="" coords="5,369,157,410"/>
+<area shape="rect" id="node9" href="$core__main_8c.html" title="src/pylib/core_main.c" alt="" coords="182,376,337,403"/>
+<area shape="rect" id="node19" href="$core__types__matrix_8c.html" title="The implementation of the matrix variant." alt="" coords="555,187,709,229"/>
+</map>
