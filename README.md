@@ -7,6 +7,7 @@ It consists mainly of a few simple types and helpers.
 
 Since anything you put up on Github(or anywhere else) is <a href="http://en.wikipedia.org/wiki/Berne_Convention">by default copyrighted</a> I have added a BSD-3 license, just in case.
 
+There is some auto-generated documentation at <a href="http://arnovich.github.io/core/">http://arnovich.github.io/core/</a>.
 
 Features
 --------
