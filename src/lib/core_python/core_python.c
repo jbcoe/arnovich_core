@@ -1,6 +1,8 @@
 
-/*
+/**
  * @file core_python.c
+ * 
+ * @brief Implementation of Python utility functions.
  */
 
 #include <core_python/core_python.h>

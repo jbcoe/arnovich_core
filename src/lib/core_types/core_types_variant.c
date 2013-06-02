@@ -1,7 +1,7 @@
 
-/*
+/**
  * @file core_types_variant.c
- * @brief generic variant type
+ * @brief The implementation of the C-style variant
  */
 
 #include <core_types/core_types_variant.h>

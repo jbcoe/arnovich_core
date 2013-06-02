@@ -1,4 +1,10 @@
 
+/**
+ * @file core_python_wrap.c
+ *
+ * @brief Implementation of various Python helpers.
+ */
+
 #include <core_python/core_python_wrap.h>
 
 typedef variant (*wrapped_function0)(void*);

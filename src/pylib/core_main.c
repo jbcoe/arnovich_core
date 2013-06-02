@@ -1,6 +1,6 @@
-/*
- * @file core_main.c
- */
+/**
+  * @file core_main.c
+  */
 
 #define DEBUG
 

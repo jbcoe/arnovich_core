@@ -1,6 +1,7 @@
-/*
- * @file srv_client.c
- */
+/**
+  * @file core_srv_client.c
+  * @brief Implementation file for server client.
+  */
 
 #include <core_srv/core_srv_client.h>
 

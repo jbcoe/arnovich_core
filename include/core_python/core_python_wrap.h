@@ -1,4 +1,11 @@
 
+/**
+ * @file core_python_wrap.h
+ * @brief Random collection of Python C-interface macros and helpers.
+ *
+ * Not really used anymore - should probably clean it up...
+ */
+
 #ifndef __CORE_PYTHON_WRAP_H__
 #define __CORE_PYTHON_WRAP_H__
 

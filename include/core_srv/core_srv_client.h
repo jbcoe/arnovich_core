@@ -1,6 +1,8 @@
-/*
- * @file srv_client.h
- */
+
+/**
+  * @file core_srv_client.h
+  * @brief The client side functionality
+  */
 
 #ifndef SRV_CLIENT_H_
 #define SRV_CLIENT_H_

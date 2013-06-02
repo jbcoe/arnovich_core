@@ -1,6 +1,7 @@
-/*
- * @file srv_server.c
- */
+/**
+  * @file core_srv_server.c
+  * @brief Implementation file for server component.
+  */
 
 #include <unistd.h>
 #include <string.h>
@@ -421,6 +422,7 @@ SRV_ERROR srv_run_server(SRV_SOCKET_TYPES socket_type)
         	"Connection accepted: Connection thread started on %i", ns)
         pthread_create(&dummy, NULL, srv_run_server_thread, &ns);
     }
+    srv_data_free_tickers(the_tickers);
 
     close(s);
     return SRV_ERROR_SUCCESS;

@@ -1,5 +1,6 @@
-/*
+/**
  * @file core_debug.c
+ * @brief Implementation file for the debug functions.
  */
 
 #ifdef DEBUG
@@ -25,7 +26,6 @@ static char                      core_debug_group_env[DEBUG_GROUP_SET_SIZE][DEBU
 static int                       core_debug_group_set = 0;
 static FILE*                     core_debug_file = NULL;
 
-//static int get_core_debug_level_env()
 int get_core_debug_level_env()
 {
 	if(core_debug_level_env==DEBUG_UNDEFINED)
@@ -56,7 +56,6 @@ void set_core_debug_group_env(char* group)
     }
 }
 
-//static int is_core_debug_group(char* group)
 int is_core_debug_group(char* group)
 {
     if(!core_debug_group_set)

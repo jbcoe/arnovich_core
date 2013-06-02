@@ -1,6 +1,66 @@
-/*
- * @file srv_types.h
+
+/**
+ * @package core_srv
+ * @brief A simple push-pop-notiication server with a C and Python interface.
+ *
+ * This module provides a very simple server component.
+ * 
+ * The server can be started by calling srv_run_server or using core_srv_run.c.
+ * 
+ * Once started you can create tickers and push data to tickers using either the C-interface(core_srv_client.h) or the Python interface(core_srv.h).
+ *
+ * Data can be fetched either by subscription, time of data or simply as the most recent.
+ *
+ * <b>Example</b>
+ *
+ * A few simple Python examples of how to create a ticker and push data.
+ * \code
+ * import arnovich.core as core
+ * connection = core.connection()
+ * ticker_id = connection.add_ticker("MY_TICKER")
+ * # a ticker is pushed by using the ticker_id
+ * connection.push_ticker(ticker_id, "MY DATA TO BE PUSHED")
+ * # you can get the ticker by doing the following
+ * ticker_id = connection.get_ticker("MY_TICKER")
+ * \endcode
+ *
+ * A simple example of how to fetch data from a ticker.
+ * 
+ * \code
+ * import arnovich.core as core
+ * connection = core.connection()
+ * ticker_id = connection.get_ticker("MY_TICKER")
+ * # pulls the most recent data for the ticker
+ * data = connection.pull_tick(ticker_id)
+ * # only pulls if a new update has happened since last read
+ * data = connection.pull_tick(ticker_id)
+ * \endcode
+ *
+ * A simple example of how to subscribe to a ticker.
+ *
+ * \code
+ * import arnovich.core as core
+ * connection = core.connection()
+ * ticker_id = connection.get_ticker("MY_TICKER")
+ * connection.subscribe(ticker_id)
+ * while True:
+ *   # this will wait for an update to happen before continuing
+ *   data = connection.wait_for_update(ticker_id)
+ * \endcode
+ *
+ * <b>Files of interest</b>
+ * - core_srv/core_srv_types.h
+ * - core_srv/core_srv_data.h
+ * - core_srv/core_srv_client.h
+ * - core_srv/core_srv_server.h
+ * - bin/core_srv_run.c
  */
+
+
+/**
+  * @file core_srv_types.h
+  * @brief Shared core_srv types.
+  */
 
 #ifndef SRV_TYPES_H_
 #define SRV_TYPES_H_

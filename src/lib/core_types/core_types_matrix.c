@@ -1,6 +1,7 @@
 
-/*
+/**
  * @file core_types_matrix.c
+ * @brief The implementation of the matrix variant
  */
 
 #include <core_types/core_types_matrix.h>

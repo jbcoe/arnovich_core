@@ -1,6 +1,6 @@
-/*
- * @file core_srv_connection.h
- */
+/**
+  * @file core_srv.h
+  */
 
 #ifndef CORE_SRV_CONNECTION_H_
 #define CORE_SRV_CONNECTION_H_

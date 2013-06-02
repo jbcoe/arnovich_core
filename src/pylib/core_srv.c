@@ -1,7 +1,7 @@
 
-/*
- * @file core_srv_connection.c
- */
+/**
+  * @file core_srv.c
+  */
 
 #include <Python.h>
 #include <structmember.h>
@@ -294,11 +294,11 @@ PyObject* Connection_wait_for_update(struct Connection *self, PyObject *args, Py
         return NULL;
     }
 
-		SRV_ERROR rtn = SRV_ERROR_SUCCESS;
+	SRV_ERROR rtn = SRV_ERROR_SUCCESS;
 
-		Py_BEGIN_ALLOW_THREADS
+	Py_BEGIN_ALLOW_THREADS
     rtn = srv_client_wait_for_tick(self->m_connection, (void **)&tickdata, &len, &datetime);
-		Py_END_ALLOW_THREADS
+	Py_END_ALLOW_THREADS
 
     if(rtn != SRV_ERROR_SUCCESS)
     {
@@ -307,10 +307,10 @@ PyObject* Connection_wait_for_update(struct Connection *self, PyObject *args, Py
     }
 
     //return Py_BuildValue("{s:s,s:d}", "Data", tickdata, "Time", ((double)datetime.tv_sec));
-		struct Tick *tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
-		tick->data = PyString_FromString(tickdata);
-		tick->time = (double)datetime.tv_sec;
-		return (PyObject*)tick;
+	struct Tick *tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
+	tick->data = PyString_FromString(tickdata);
+	tick->time = (double)datetime.tv_sec;
+	return (PyObject*)tick;
 }
 
 void Connection_dealloc(struct Connection* self)

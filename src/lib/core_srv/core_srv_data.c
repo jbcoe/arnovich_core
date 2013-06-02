@@ -1,6 +1,8 @@
-/*
- * @file srv_data.c
- */
+
+/**
+  * @file core_srv_data.c
+  * @brief Implementation file for data type.
+  */
 
 #include <core_srv/core_srv_data.h>
 
@@ -8,14 +10,42 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void srv_data_init_tick(struct srv_tick **tick, void* data, size_t len)
+{
+    (*tick) = (struct srv_tick*)malloc(sizeof(struct srv_tick));
+    (*tick)->m_data = (void*)malloc(len);
+    memcpy((*tick)->m_data, data, len);
+    (*tick)->m_len = len;
+    gettimeofday(&((*tick)->m_datetime), NULL);
+}
 
-//TODO do a free_tickers method as well
+void srv_data_free_tick(struct srv_tick *tick)
+{
+    free(tick->m_data);
+    srv_data_free_tick(tick->m_next);
+    free(tick);
+}
+
 void srv_data_init_tickers(struct srv_tickers **tickers)
 {
     (*tickers) = (struct srv_tickers *)malloc(sizeof(struct srv_tickers ));
     (*tickers)->m_ntickers = 0;
     (*tickers)->m_tickers = NULL;
     pthread_mutex_init(&(*tickers)->m_tickerslock, NULL);
+}
+
+void srv_data_free_tickers(struct srv_tickers *tickers)
+{
+    pthread_mutex_destroy(&tickers->m_tickerslock);
+    free(tickers->m_tickers);
+    int i;
+    for(i=0;i<tickers->m_ntickers;++i)
+    {
+        pthread_mutex_destroy(&tickers->m_tickers[i]->m_tickslock);
+        pthread_mutex_destroy(&tickers->m_tickers[i]->m_subscriblock);
+        srv_data_free_tick(tickers->m_tickers[i]->m_ticks);
+    }
+    free(tickers);
 }
 
 SRV_ERROR srv_get_ticker(struct srv_tickers *tickers, char *ticker, int *id)
@@ -66,11 +96,9 @@ SRV_ERROR srv_push_tick(struct srv_tickers *tickers, int id, void *tickdata, siz
         return SRV_ERROR_UNKNOWN_TICKER;
     }
 
-    struct srv_tick *new_tick = (struct srv_tick *)malloc(sizeof(struct srv_tick));
-    new_tick->m_data = (void*)malloc(len);
-    memcpy(new_tick->m_data, tickdata, len);
-    new_tick->m_len = len;
-    gettimeofday(&new_tick->m_datetime, NULL);
+    struct srv_tick *new_tick;
+    srv_data_init_tick(&new_tick, tickdata, len);
+
     pthread_mutex_lock(&tickers->m_tickers[id]->m_tickslock);
     new_tick->m_next = tickers->m_tickers[id]->m_ticks;
     tickers->m_tickers[id]->m_ticks = new_tick;
