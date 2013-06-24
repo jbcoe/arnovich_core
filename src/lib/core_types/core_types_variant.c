@@ -283,7 +283,7 @@ int variant_or(variant a, variant b)
 }
 variant variant_add(variant a, variant b)
 {
-    variant rtn = VARIANT_EMPTY;
+    variant rtn = VARIANT_EMPTY();
     switch(a.m_type)
     {
     case CORE_TYPES_VARIANT_INT:
@@ -345,7 +345,7 @@ variant variant_add(variant a, variant b)
 
 variant variant_multiply(variant a, variant b)
 {
-    variant rtn = VARIANT_EMPTY;
+    variant rtn = VARIANT_EMPTY();
     switch(a.m_type)
     {
     case CORE_TYPES_VARIANT_INT:
@@ -407,12 +407,13 @@ typedef variant (*variant_function_object5)(void*, variant, variant, variant, va
 
 static variant _variant_call(variant f, va_list vl)
 {
+    variant rtn;
+
     if(!variant_is_function(f))
     {
         return variant_from_error("cannot call on a non-function variant");
     }
  
-    variant rtn;
     switch(f.m_v.m_f.m_n)
     {
         case 0:
@@ -500,9 +501,9 @@ static variant _variant_call(variant f, va_list vl)
 
 variant variant_call(variant f, ...)
 {
+    variant rtn;
     va_list vl;
     va_start(vl, f);
-    variant rtn;
     rtn = _variant_call(f, vl);
     va_end(vl);
     return rtn;

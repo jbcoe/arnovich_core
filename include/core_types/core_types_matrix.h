@@ -86,12 +86,12 @@ void matrix_move_rows(matrix m, int row1, int row2);
 /**
   * @brief Returns columns \c col as a column matrix.
   */
-matrix matrix_get_column(matrix m, int col);
+matrix matrix_get_column(matrix m, unsigned int col);
 
 /**
   * @brief Returns row \c row as a row matrix.
   */
-matrix matrix_get_row(matrix m, int row);
+matrix matrix_get_row(matrix m, unsigned int row);
 
 /**
   * @brief Swaps row \c row1 and row \c row2.
@@ -101,7 +101,9 @@ void matrix_replace_row(matrix a, int row1, matrix b, int row2);
 ///@}
 
 #ifndef __cplusplus
+#ifndef _WIN32
 #define MATRIX_USE_MACROS
+#endif
 #endif
 
 #ifdef MATRIX_USE_MACROS
@@ -122,12 +124,12 @@ void matrix_replace_row(matrix a, int row1, matrix b, int row2);
 #define matrix_get(m,i,j) (m).m_values[(j)*(m).m_width+i]
 
 /**
-  * @brief GSt element at ( \c i , \c j) with bounds check and do nothing if out-of-bounds.
+  * @brief Get element at ( \c i , \c j) with bounds check and do nothing if out-of-bounds.
   */
 #define matrix_set_safe(m,i,j,v) if((i < (m).m_width) && (j < (m).m_height)){(m).m_values[(j)*m.m_width+i] = v;}
 
 /**
-  * @brief GSt element at ( \c i , \c j) without checking bounds.
+  * @brief Get element at ( \c i , \c j) without checking bounds.
   */
 #define matrix_set(m,i,j,v) (m).m_values[(j)*(m).m_width+i] = v;
 

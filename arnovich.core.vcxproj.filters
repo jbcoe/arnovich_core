@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Header Files\core_debug">
+      <UniqueIdentifier>{9f5c387a-7811-4250-86bc-d623e38a46da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core_python">
+      <UniqueIdentifier>{c1ca735f-7e2f-444e-affe-c5eedde45573}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core_srv">
+      <UniqueIdentifier>{9412434a-0638-4137-9913-0e1042b40b8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core_types">
+      <UniqueIdentifier>{4c9d7261-77e4-494c-afa9-01b7390439e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core_debug">
+      <UniqueIdentifier>{9991c08a-af83-435e-83b8-faae898a7153}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core_python">
+      <UniqueIdentifier>{b7dd3e82-ddd7-463e-a7a9-610100069b24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core_srv">
+      <UniqueIdentifier>{2d45972f-93fb-42e4-a970-8fe25d6dc6ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core_types">
+      <UniqueIdentifier>{a820e1bd-19d0-4c54-857c-e53e6b28ccbb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\lib\core_debug\core_debug.c">
+      <Filter>Source Files\core_debug</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\core_python\core_python.c">
+      <Filter>Source Files\core_python</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\core_python\core_python_wrap.c">
+      <Filter>Source Files\core_python</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\core_srv\core_srv_client.c">
+      <Filter>Source Files\core_srv</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\core_types\core_types_matrix.c">
+      <Filter>Source Files\core_types</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\mainpage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_debug\core_debug.h">
+      <Filter>Header Files\core_debug</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_debug\core_debug.hpp">
+      <Filter>Header Files\core_debug</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_python\core_python.h">
+      <Filter>Header Files\core_python</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_python\core_python_wrap.h">
+      <Filter>Header Files\core_python</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_srv\core_srv_client.h">
+      <Filter>Header Files\core_srv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_srv\core_srv_types.h">
+      <Filter>Header Files\core_srv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_types\core_types_matrix.h">
+      <Filter>Header Files\core_types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_types\core_types_variant.h">
+      <Filter>Header Files\core_types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core_types\core_types_variant.hpp">
+      <Filter>Header Files\core_types</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

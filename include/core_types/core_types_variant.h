@@ -212,7 +212,9 @@ matrix variant_as_matrix(variant v);
 ///@}
 
 #ifndef __cplusplus
-#define VARIANT_USE_MACROS
+#ifndef _WIN32
+#define MATRIX_USE_MACROS
+#endif
 #endif
 
 #ifdef VARIANT_USE_MACROS

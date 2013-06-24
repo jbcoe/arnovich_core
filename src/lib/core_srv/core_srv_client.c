@@ -14,14 +14,28 @@
     #include <sys/un.h>
     #include <netdb.h>
     #include <netinet/tcp.h>
+    #include <unistd.h>
 #endif
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
+#ifdef _WIN32
+int write(SOCKET s, void *buf, int len)
+{
+    return send(s, (const char*)buf, len, MSG_DONTROUTE);
+}
+int close(SOCKET s)
+{
+    return closesocket(s);
+}
+int read(SOCKET s, void *buf, int len)
+{
+    return recv(s, (char*)buf, len, MSG_WAITALL);
+}
+#endif
 
 #ifdef DEBUG
 
@@ -48,6 +62,9 @@ SRV_ERROR srv_client_connect(struct srv_client_connection ** connection, SRV_SOC
     int protocol;
     int saddr_len;
     struct protoent* tcp;
+    struct hostent* localhost;
+    SRV_COMMANDS command = SRV_COMMANDS_OPEN_CONNECTION;
+    size_t r;
 
     switch(socket_type) {
     case SRV_SOCKET_TYPES_LOCAL_PIPES:
@@ -78,7 +95,7 @@ SRV_ERROR srv_client_connect(struct srv_client_connection ** connection, SRV_SOC
        	isa.sin_family = AF_INET;
        	isa.sin_port = htons(SRV_TCP_IP_SERVER_PORT);
 
-       	struct hostent* localhost = gethostbyname(SRV_TCP_IP_SERVER_ADDRESS);
+       	localhost = gethostbyname(SRV_TCP_IP_SERVER_ADDRESS);
        	memcpy(&isa.sin_addr.s_addr, localhost->h_addr_list[0], sizeof(localhost->h_length));
 
        	saddr = (struct sockaddr*)&isa;
@@ -107,8 +124,7 @@ SRV_ERROR srv_client_connect(struct srv_client_connection ** connection, SRV_SOC
         return SRV_ERROR_CONNNECTION_ERROR;
     }
 
-    SRV_COMMANDS command = SRV_COMMANDS_OPEN_CONNECTION;
-    size_t r = write((*connection)->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
+    r = write((*connection)->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     if(r != sizeof(SRV_COMMANDS))
     {
         _DEBUG(
@@ -130,11 +146,13 @@ void srv_client_close_connection(struct srv_client_connection *connection)
 SRV_ERROR srv_client_add_ticker(struct srv_client_connection *connection, const char *ticker, int *id)
 {
     SRV_COMMANDS command = SRV_COMMANDS_ADD_TICKER;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    size_t nelem;
+
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)ticker, sizeof(char)*SRV_TICKER_LEN);
 
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
-    size_t nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
+    nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "failed to catch return error %i", (int)nelem);
@@ -155,15 +173,17 @@ SRV_ERROR srv_client_add_ticker(struct srv_client_connection *connection, const 
 
 SRV_ERROR srv_client_get_ticker(struct srv_client_connection *connection, const char *ticker, int *id)
 {
+    SRV_COMMANDS command = SRV_COMMANDS_GET_TICKER;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    size_t nelem;
+
     _DEBUG(
         "SRV_COMMANDS_GET_TICKER ticker=%s", ticker);
 
-    SRV_COMMANDS command = SRV_COMMANDS_GET_TICKER;
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)ticker, sizeof(char)*SRV_TICKER_LEN);
 
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
-    size_t nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
+    nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "failed to catch return error %i", (int)nelem);
@@ -187,19 +207,21 @@ SRV_ERROR srv_client_get_ticker(struct srv_client_connection *connection, const 
 SRV_ERROR srv_client_push_tick(struct srv_client_connection *connection, int id, void *tickdata, size_t len)
 {
     SRV_COMMANDS command = SRV_COMMANDS_PUSH_TICK;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    int i;
+    size_t nelem;
+
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)&id, sizeof(int));
     write(connection->m_connection, (void*)&len, sizeof(size_t));
 
-    int i;
     i=len/SRV_BUFFER_LEN;
-    size_t nelem = write(connection->m_connection, (void*)(((char*)tickdata)+SRV_BUFFER_LEN*i), len%SRV_BUFFER_LEN);
+    nelem = write(connection->m_connection, (void*)(((char*)tickdata)+SRV_BUFFER_LEN*i), len%SRV_BUFFER_LEN);
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "client write tick data failed %i", (int)nelem);
         return SRV_ERROR_WRITE_ERROR;
     }
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
     nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(err != SRV_ERROR_SUCCESS) {
         _DEBUG( \
@@ -239,11 +261,14 @@ SRV_ERROR srv_client_push_tick(struct srv_client_connection *connection, int id,
 SRV_ERROR srv_client_pull_tick(struct srv_client_connection *connection, int id, void **tickdata, size_t *len, struct timeval* datetime)
 {
     SRV_COMMANDS command = SRV_COMMANDS_PULL_TICK;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    size_t nelem;
+    int i;
+
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)&id, sizeof(int));
 
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
-    size_t nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
+    nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "failed to catch return error %i", (int)nelem);
@@ -262,7 +287,6 @@ SRV_ERROR srv_client_pull_tick(struct srv_client_connection *connection, int id,
     *tickdata = (void*)malloc(*len);
     memset(*tickdata, 0, *len);
 
-    int i;
     i=(*len)/SRV_BUFFER_LEN;
     nelem = read(connection->m_connection, (void*)(((char*)*tickdata)+SRV_BUFFER_LEN*i), (*len)%SRV_BUFFER_LEN);
     if(nelem <= 0){ // = 0 means that it closed
@@ -297,12 +321,15 @@ SRV_ERROR srv_client_pull_tick(struct srv_client_connection *connection, int id,
 SRV_ERROR srv_client_pull_tick_by_datetime(struct srv_client_connection *connection, int id, struct timeval datetime, void **tickdata, size_t *len, struct timeval* pdatetime)
 {
     SRV_COMMANDS command = SRV_COMMANDS_PULL_TICK_BY_DATETIME;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    size_t nelem;
+    int i;
+
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)&id, sizeof(int));
     write(connection->m_connection, (void*)&datetime, sizeof(struct timeval));
 
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
-    size_t nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
+    nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "failed to catch return error %i", (int)nelem);
@@ -320,7 +347,6 @@ SRV_ERROR srv_client_pull_tick_by_datetime(struct srv_client_connection *connect
     *tickdata = (void*)malloc(*len);
     memset(*tickdata, 0, *len);
 
-    int i;
     i=(*len)/SRV_BUFFER_LEN;
     nelem = read(connection->m_connection, (void*)(((char*)*tickdata)+SRV_BUFFER_LEN*i), (*len)%SRV_BUFFER_LEN);
     if(nelem <= 0){ // = 0 means that it closed
@@ -349,11 +375,14 @@ SRV_ERROR srv_client_pull_tick_by_datetime(struct srv_client_connection *connect
 SRV_ERROR srv_client_pull_tick_update(struct srv_client_connection *connection, int id, void **tickdata, size_t *len, struct timeval* pdatetime)
 {
     SRV_COMMANDS command = SRV_COMMANDS_PULL_TICK_UPDATE;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    size_t nelem;
+    int i;
+
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)&id, sizeof(int));
 
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
-    size_t nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
+    nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "failed to catch return error %i", (int)nelem);
@@ -374,7 +403,6 @@ SRV_ERROR srv_client_pull_tick_update(struct srv_client_connection *connection, 
     *tickdata = (void*)malloc(*len);
     memset(*tickdata, 0, *len);
 
-    int i;
     i=(*len)/SRV_BUFFER_LEN;
     nelem = read(connection->m_connection, (void*)(((char*)*tickdata)+SRV_BUFFER_LEN*i), (*len)%SRV_BUFFER_LEN);
     if(nelem <= 0){ // = 0 means that it closed
@@ -403,11 +431,13 @@ SRV_ERROR srv_client_pull_tick_update(struct srv_client_connection *connection, 
 SRV_ERROR srv_client_subscribe(struct srv_client_connection *connection, int id)
 {
     SRV_COMMANDS command = SRV_COMMANDS_SUBSCRIBE_TO_TICKER;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    size_t nelem;
+
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)&id, sizeof(int));
 
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
-    size_t nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
+    nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "failed to catch return error %i", (int)nelem);
@@ -423,11 +453,13 @@ SRV_ERROR srv_client_subscribe(struct srv_client_connection *connection, int id)
 SRV_ERROR srv_client_unsubscribe(struct srv_client_connection *connection, int id)
 {
     SRV_COMMANDS command = SRV_COMMANDS_UNSUBSCRIBE_TO_TICKER;
+    SRV_ERROR err = SRV_ERROR_SUCCESS;
+    size_t nelem;
+
     write(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     write(connection->m_connection, (void*)&id, sizeof(int));
 
-    SRV_ERROR err = SRV_ERROR_SUCCESS;
-    size_t nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
+    nelem = read(connection->m_connection, (void*)&err, sizeof(SRV_ERROR));
     if(nelem <= 0){ // = 0 means that it closed
         _DEBUG(
             "failed to catch return error %i", (int)nelem);
@@ -442,7 +474,8 @@ SRV_ERROR srv_client_unsubscribe(struct srv_client_connection *connection, int i
 
 SRV_ERROR srv_client_wait_for_tick(struct srv_client_connection *connection, void **tickdata, size_t *len, struct timeval* datetime)
 {
-	 SRV_COMMANDS command = -1;
+    SRV_COMMANDS command = SRV_COMMANDS_INVALID;
+    int i;
 
     size_t nelem = read(connection->m_connection, (void*)&command, sizeof(SRV_COMMANDS));
     if(nelem <= 0) { // = 0 means that it closed
@@ -464,7 +497,6 @@ SRV_ERROR srv_client_wait_for_tick(struct srv_client_connection *connection, voi
     *tickdata = (void*)malloc(*len);
     memset(*tickdata, 0, *len);
 
-    int i;
     i=(*len)/SRV_BUFFER_LEN;
     nelem = read(connection->m_connection, (void*)(((char*)*tickdata)+SRV_BUFFER_LEN*i), (*len)%SRV_BUFFER_LEN);
     if(nelem <= 0){ // = 0 means that it closed

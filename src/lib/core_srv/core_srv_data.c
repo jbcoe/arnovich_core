@@ -36,9 +36,9 @@ void srv_data_init_tickers(struct srv_tickers **tickers)
 
 void srv_data_free_tickers(struct srv_tickers *tickers)
 {
+    int i;
     pthread_mutex_destroy(&tickers->m_tickerslock);
     free(tickers->m_tickers);
-    int i;
     for(i=0;i<tickers->m_ntickers;++i)
     {
         pthread_mutex_destroy(&tickers->m_tickers[i]->m_tickslock);

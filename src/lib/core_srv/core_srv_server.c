@@ -73,7 +73,7 @@ static struct srv_tickers *the_tickers = NULL;
 void* srv_run_server_thread(void *vconnection)
 {
     int connection = *((int*)(vconnection));
-    SRV_COMMANDS command = -1;
+    SRV_COMMANDS command = SRV_COMMANDS_INVALID;
     char ticker[SRV_TICKER_LEN];
     size_t nelem;
     int id;

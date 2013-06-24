@@ -83,6 +83,7 @@ typedef enum {
 #define SRV_BUFFER_LEN        8000
 
 typedef enum {
+    SRV_COMMANDS_INVALID                           = -1,
     SRV_COMMANDS_OPEN_CONNECTION                   = 0,
     SRV_COMMANDS_CLOSE_CONNECTION                  = 1,
     SRV_COMMANDS_ADD_TICKER                        = 2,

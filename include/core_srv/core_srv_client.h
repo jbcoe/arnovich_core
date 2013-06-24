@@ -10,7 +10,11 @@
 #include <core_srv/core_srv_types.h>
 
 
+#ifdef _WIN32
+#include <time.h>
+#else
 #include <sys/time.h>
+#endif
 #include <time.h>
 
 struct srv_client_connection

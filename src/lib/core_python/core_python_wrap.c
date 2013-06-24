@@ -46,19 +46,20 @@ static char* variant_error_msg(char* str)
 // simple function with no python state 
 PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_error_function err, void *self)
 {
+    PyObject *obj1 = NULL, *obj2 = NULL, *obj3 = NULL, *obj4 = NULL, *obj5 = NULL, *py_rtn = NULL;
+    variant rtn;
+
     if((args && (PyTuple_Size(args) != nargs)) || (!args && (nargs != 0)))
     {
         PyErr_Format(PyExc_StandardError, "Wrong number of arguments: expected %i got %i", nargs, (int)PyTuple_Size(args));
         return NULL;
     }
-    PyObject *obj1 = NULL, *obj2 = NULL, *obj3 = NULL, *obj4 = NULL, *obj5 = NULL; //etc
     if((nargs != 0) && !PyArg_ParseTuple(args, "|OOOOO", &obj1, &obj2, &obj3, &obj4, &obj5))
     {
         PyErr_SetString(PyExc_StandardError, "Wrong number of arguments");
         return NULL;
     }
 
-    variant rtn;
     switch(nargs)
     {
     case 0:
@@ -132,7 +133,7 @@ PyObject* python_wrap_function(PyObject* args, int nargs, void* function, py_err
 		return NULL;
     }
     
-    PyObject* py_rtn = core_python_variant_to_py(rtn);
+    py_rtn = core_python_variant_to_py(rtn);
     variant_free(rtn);
     return py_rtn;
 }

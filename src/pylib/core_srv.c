@@ -7,6 +7,7 @@
 #include <structmember.h>
 
 #include <core_srv/core_srv_client.h>
+#include <core_srv/core_srv_types.h>
 
 void srv_seterror(const char * msg);
 
@@ -123,7 +124,8 @@ PyObject* Connection_add_ticker(struct Connection *self, PyObject *args, PyObjec
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_add_ticker(self->m_connection, ticker, &id);
+    SRV_ERROR rtn;
+	//= srv_client_add_ticker(self->m_connection, ticker, &id);
 
     if(rtn != SRV_ERROR_SUCCESS) {
         srv_seterror(

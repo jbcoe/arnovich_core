@@ -4,6 +4,10 @@
  * @brief The implementation of the matrix variant
  */
 
+#ifdef _WIN32
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <core_types/core_types_matrix.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -33,7 +37,7 @@ void matrix_swap(matrix to, matrix from)
     if((to.m_width == from.m_width) && 
        (to.m_height == from.m_height))
     {
-        int i, j;
+        unsigned int i, j;
         for(i=0; i<to.m_width; ++i)
         {
             for(j=0; j<to.m_height; ++j)
@@ -56,7 +60,7 @@ int matrix_compare(matrix a, matrix b)
 {
     if((a.m_width == b.m_width) && (a.m_height == b.m_height))
     {
-        int i,j;
+        unsigned int i,j;
         for(i=0;i<a.m_width;++i)
         {
             for(j=0;j<a.m_height;++j)
@@ -76,9 +80,10 @@ matrix matrix_identity(int n)
 {
     matrix m = matrix_init(n,n);
     int i;
-    for(i=0;i<n;++i)
+    for(i = 0; i < n; ++i)
     {
-        matrix_set(m,i,i,variant_from_int(1));
+        variant_from_int(1);
+        //matrix_set(m, i, i, variant_from_int(1));
     }
     return m;
 }
@@ -87,14 +92,14 @@ char* matrix_to_string(matrix m)
 {
     static char str[10][STRING_LENGTH];
     static int n = 0;
+	unsigned int i, j;
     ++n;
-    if(n==10) n = 0;
+    if(n == 10) n = 0;
     strcpy(str[n], "[");
-    int i, j;
-    for(i=0;i<m.m_height;++i)
+    for(i = 0; i < m.m_height; ++i)
     {
         strcat(str[n], "[");
-        for(j=0;j<m.m_width;++j)
+        for( j = 0; j < m.m_width; ++j)
         {
             strcat(str[n], variant_to_string(matrix_get(m,j,i)));
             strcat(str[n], ",");
@@ -108,8 +113,8 @@ char* matrix_to_string(matrix m)
 
 void matrix_move_rows(matrix m, int row1, int row2)
 {
-    int i;
-    for(i=0; i<m.m_width; ++i)
+    unsigned int i;
+    for(i = 0; i < m.m_width; ++i)
     {
         variant tmp = matrix_get(m, i, row1);
         matrix_set(m, i, row1, matrix_get(m, i, row2));
@@ -117,12 +122,12 @@ void matrix_move_rows(matrix m, int row1, int row2)
     }
 }
 
-matrix matrix_get_column(matrix m, int col)
+matrix matrix_get_column(matrix m, unsigned int col)
 {
     matrix c = matrix_init(1, m.m_height);
     if(col < m.m_width)
     {
-        int i;
+        unsigned int i;
         for(i = 0; i<m.m_height; ++i)
         {
             matrix_set(c, 0, i, matrix_get(m, col, i));
@@ -131,13 +136,13 @@ matrix matrix_get_column(matrix m, int col)
     return c;
 }
 
-matrix matrix_get_row(matrix m, int row)
+matrix matrix_get_row(matrix m, unsigned int row)
 {
     matrix c = matrix_init(m.m_width, 1);
     if(row < m.m_height)
     {
-        int i;
-        for(i = 0; i<m.m_width; ++i)
+        unsigned int i;
+        for(i = 0;  i < m.m_width; ++i)
         {
             matrix_set(c, i, 0, matrix_get(m, i, row));
         }
@@ -161,7 +166,7 @@ variant _matrix_get(matrix m, unsigned int i, unsigned int j)
     {
         return m.m_values[j*m.m_width+i];
     }
-    return VARIANT_NIL;
+    return VARIANT_NIL();
 }
 
 void _matrix_set(matrix m, unsigned int i, unsigned int j, variant v)

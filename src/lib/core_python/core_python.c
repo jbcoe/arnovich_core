@@ -9,7 +9,7 @@
 
 variant core_python_py_to_variant(PyObject* o)
 {
-    if((o == NULL) || (o == Py_None))return VARIANT_NIL;
+    if((o == NULL) || (o == Py_None))return VARIANT_NIL();
     if(PyInt_Check(o))
     {
         return variant_from_int(PyInt_AsLong(o));
@@ -56,7 +56,7 @@ variant core_python_py_to_variant(PyObject* o)
         }
         return variant_from_bool(0);
     }
-    return VARIANT_NIL;
+    return VARIANT_NIL();
 }
 
 PyObject* core_python_variant_to_py(variant v)
@@ -100,6 +100,7 @@ matrix core_python_py_to_matrix(PyObject* o)
         int height = PyList_Size(o);
         int i=0;
         int width = 1;
+        matrix m;
         for(;i<height;++i)
         {
             PyObject* obj = PyList_GetItem(o, i);
@@ -108,7 +109,7 @@ matrix core_python_py_to_matrix(PyObject* o)
                 width = (width < PyList_Size(obj))?PyList_Size(obj):width;
             }
         }
-        matrix m = matrix_init(width, height);
+        m = matrix_init(width, height);
         for(i=0;i<height;++i)
         {
             PyObject* obj = PyList_GetItem(o, i);
@@ -126,7 +127,7 @@ matrix core_python_py_to_matrix(PyObject* o)
             }
             for(;j<width;++j)
             {
-                matrix_set(m, j, i, VARIANT_NIL);
+                matrix_set(m, j, i, VARIANT_NIL());
             }
         }
         return m;
@@ -151,6 +152,7 @@ matrix core_python_py_to_matrix(PyObject* o)
 
 PyObject* core_python_matrix_to_py(matrix m)
 {
+    PyObject* rows;
     int height = m.m_height;
     if(height == 1)
     {
@@ -166,7 +168,7 @@ PyObject* core_python_matrix_to_py(matrix m)
         }
         return row;
     }
-    PyObject* rows = PyList_New(height);
+    rows = PyList_New(height);
     if(rows)
     {
         int width = m.m_width;
@@ -190,16 +192,16 @@ PyObject* core_python_matrix_to_py(matrix m)
 
 PyObject* core_python_variants_to_py_dict(variant vars, variant vals)
 {
+    PyObject* rtn;
     if(variant_is_matrix(vars) && variant_is_matrix(vals))
     {
         matrix m1 = variant_as_matrix(vars);
         matrix m2 = variant_as_matrix(vals);
 
-        int n = m1.m_height;
+        int n = m1.m_height, i = 0;
         if(n != m2.m_height) return NULL;
 
-        PyObject* rtn = PyDict_New();
-        int i = 0;
+        rtn = PyDict_New();
         for(; i<n; ++i)
         {
             PyDict_SetItem(rtn, 

@@ -6,8 +6,12 @@
 #ifndef SRV_DATA_H_
 #define SRV_DATA_H_
 
+#ifdef _WIN32
+#include <time.h>
+#else
 #include <pthread.h>
 #include <sys/time.h>
+#endif
 
 #include <core_srv/core_srv_types.h>
 
