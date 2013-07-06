@@ -24,7 +24,7 @@ variant set_level(variant i)
         return variant_from_error("Invalid debug level");
     }
     _SET_DEBUG_LEVEL(variant_as_int(i));
-    return VARIANT_EMPTY;
+    return VARIANT_EMPTY();
 }
 
 variant set_group(variant s)
@@ -34,7 +34,7 @@ variant set_group(variant s)
         return variant_from_error("Invalid debug group");
     }
     _SET_DEBUG_GROUP(variant_as_string(s));
-    return VARIANT_EMPTY;
+    return VARIANT_EMPTY();
 }
 
 variant do_debug(variant i, variant s)
@@ -45,7 +45,7 @@ variant do_debug(variant i, variant s)
     {
         printf("%s \n",variant_to_string(s));
     };
-    return VARIANT_EMPTY;
+    return VARIANT_EMPTY();
 }
 
 DEFINE_PY_FUNCTION(_set_debug_level, set_level, 1, desc)

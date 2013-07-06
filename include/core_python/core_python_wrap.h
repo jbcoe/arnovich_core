@@ -9,9 +9,8 @@
 #ifndef __CORE_PYTHON_WRAP_H__
 #define __CORE_PYTHON_WRAP_H__
 
-#include <Python.h>
-#include "structmember.h"
 #include <core_python/core_python.h>
+#include "structmember.h"
 
 // simple function with no python state 
 typedef int (*py_error_function)(char* name, char* msg);
@@ -53,9 +52,9 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
             typedef variant (*wrapped_function4)(variant, variant, variant, variant); \
             typedef variant (*wrapped_function5)(variant, variant, variant, variant, variant); \
             va_list vl; \
-            va_start(vl, self); \
             variant rtn;\
             void* func = FUNCTION; \
+            va_start(vl, self); \
             switch(NARGS) \
             { \
             case 0: \
@@ -340,8 +339,6 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
     } \
     PyMODINIT_FUNC init_##NAME(void) \
     { \
-        Py_AtExit(NAME##_at_exit); \
-        Py_add_method(NULL, NULL, 0, NULL); \
         char* name = "arnovich._"#NAME; \
         char* description = #DESCRIPTION; \
         struct PyObjects **objects = &NAME##_objects; \
@@ -349,7 +346,9 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
         struct PyConstants **constants = &NAME##_constants; \
         size_t *nconstants = &NAME##_nconstants; \
         PyMethodDef **methods = &NAME##_methods; \
-        py_error_function error_func = NAME##_error;
+        py_error_function error_func = NAME##_error; \
+        Py_AtExit(NAME##_at_exit); \
+        Py_add_method(NULL, NULL, 0, NULL);
 
 #define ADD_PY_FUNCTION(NAME) \
         NAME##_error = error_func; \
@@ -367,21 +366,23 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
         Py_add_constant(#NAME, VALUE);
 
 #define END_PY_MODULE \
-        PyObject *module = Py_InitModule3(name, *methods, description); \
-        if(module) \
         { \
-            int i = 0; \
-            for(;i<*nobjects;++i) \
+            PyObject *module = Py_InitModule3(name, *methods, description); \
+            if(module) \
             { \
-                if(PyType_Ready((*objects)[i].m_type) >= 0) \
+                int i = 0; \
+                for(;i<*nobjects;++i) \
                 { \
-                    Py_INCREF((*objects)[i].m_type); \
-                    PyModule_AddObject(module, (*objects)[i].m_name, (PyObject*)(*objects)[i].m_type); \
+                    if(PyType_Ready((*objects)[i].m_type) >= 0) \
+                    { \
+                        Py_INCREF((*objects)[i].m_type); \
+                        PyModule_AddObject(module, (*objects)[i].m_name, (PyObject*)(*objects)[i].m_type); \
+                    } \
                 } \
-            } \
-            for(i = 0;i<*nconstants;++i) \
-            { \
-                PyModule_AddIntConstant(module, (*constants)[i].m_name, (*constants)[i].m_value); \
+                for(i = 0;i<*nconstants;++i) \
+                { \
+                    PyModule_AddIntConstant(module, (*constants)[i].m_name, (*constants)[i].m_value); \
+                } \
             } \
         } \
     } 

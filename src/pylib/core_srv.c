@@ -9,6 +9,10 @@
 #include <core_srv/core_srv_client.h>
 #include <core_srv/core_srv_types.h>
 
+#ifdef _WIN32
+#include <Winsock2.h>
+#endif
+
 void srv_seterror(const char * msg);
 
 struct Tick {
@@ -114,8 +118,9 @@ struct Connection {
 
 PyObject* Connection_add_ticker(struct Connection *self, PyObject *args, PyObject *kwds)
 {
-    char *ticker;
-    int   id;
+    char         *ticker;
+    int           id;
+    SRV_ERROR     rtn;
 
     if (!PyArg_ParseTuple(args, "s", &ticker))
     {
@@ -124,7 +129,7 @@ PyObject* Connection_add_ticker(struct Connection *self, PyObject *args, PyObjec
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_add_ticker(self->m_connection, ticker, &id);
+    rtn = srv_client_add_ticker(self->m_connection, ticker, &id);
 
     if(rtn != SRV_ERROR_SUCCESS) {
         srv_seterror(
@@ -137,8 +142,9 @@ PyObject* Connection_add_ticker(struct Connection *self, PyObject *args, PyObjec
 
 PyObject* Connection_get_ticker(struct Connection *self, PyObject *args, PyObject *kwds)
 {
-    char *ticker;
-    int   id;
+    char        *ticker;
+    int          id;
+    SRV_ERROR    rtn;
 
     if (!PyArg_ParseTuple(args, "s", &ticker))
     {
@@ -147,7 +153,7 @@ PyObject* Connection_get_ticker(struct Connection *self, PyObject *args, PyObjec
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_get_ticker(self->m_connection, ticker, &id);
+    rtn = srv_client_get_ticker(self->m_connection, ticker, &id);
 
     if(rtn != SRV_ERROR_SUCCESS) {
         srv_seterror(
@@ -160,8 +166,9 @@ PyObject* Connection_get_ticker(struct Connection *self, PyObject *args, PyObjec
 
 PyObject* Connection_push_tick(struct Connection *self, PyObject *args, PyObject *kwds)
 {
-    int   id;
-    char *tickdata;
+    int         id;
+    char       *tickdata;
+    SRV_ERROR   rtn;
 
     if (!PyArg_ParseTuple(args, "is", &id, &tickdata))
     {
@@ -170,7 +177,7 @@ PyObject* Connection_push_tick(struct Connection *self, PyObject *args, PyObject
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_push_tick(self->m_connection, id, (void *)tickdata, (strlen(tickdata)+1)*sizeof(char));
+    rtn = srv_client_push_tick(self->m_connection, id, (void *)tickdata, (strlen(tickdata)+1)*sizeof(char));
 
     if(rtn != SRV_ERROR_SUCCESS) {
         srv_seterror(
@@ -187,6 +194,8 @@ PyObject* Connection_pull_tick(struct Connection *self, PyObject *args, PyObject
     char              *tickdata;
     size_t             len;
     struct timeval     datetime;
+    SRV_ERROR          rtn;
+    struct Tick       *tick;
 
     if (!PyArg_ParseTuple(args, "i", &id))
     {
@@ -195,7 +204,7 @@ PyObject* Connection_pull_tick(struct Connection *self, PyObject *args, PyObject
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_pull_tick(self->m_connection, id, (void **)&tickdata, &len, &datetime);
+    rtn = srv_client_pull_tick(self->m_connection, id, (void **)&tickdata, &len, &datetime);
 
     if(rtn != SRV_ERROR_SUCCESS) {
         srv_seterror(
@@ -205,7 +214,7 @@ PyObject* Connection_pull_tick(struct Connection *self, PyObject *args, PyObject
 
     //datetime.tv_sec * 1.0 + datetime.tv_usec * 1.0e-6
     //return Py_BuildValue("{s:s,s:d}", "Data", tickdata, "Time", ((double)datetime.tv_sec));
-	struct Tick *tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
+	tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
 	tick->data = PyString_FromString(tickdata);
 	tick->time = (double)datetime.tv_sec;
 	return (PyObject*)tick;
@@ -217,6 +226,8 @@ PyObject* Connection_pull_tick_update(struct Connection *self, PyObject *args, P
     char              *tickdata;
     size_t             len;
     struct timeval     datetime;
+    SRV_ERROR          rtn;
+    struct Tick       *tick;
 
     if (!PyArg_ParseTuple(args, "i", &id))
     {
@@ -225,7 +236,7 @@ PyObject* Connection_pull_tick_update(struct Connection *self, PyObject *args, P
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_pull_tick_update(self->m_connection, id, (void **)&tickdata, &len, &datetime);
+    rtn = srv_client_pull_tick_update(self->m_connection, id, (void **)&tickdata, &len, &datetime);
 
     if(rtn != SRV_ERROR_SUCCESS) {
         srv_seterror(
@@ -233,8 +244,7 @@ PyObject* Connection_pull_tick_update(struct Connection *self, PyObject *args, P
 				return NULL;
     }
 
-    //return Py_BuildValue("{s:s,s:d}", "Data", tickdata, "Time", ((double)datetime.tv_sec));
-	struct Tick *tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
+	tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
 	tick->data = PyString_FromString(tickdata);
 	tick->time = (double)datetime.tv_sec;
 	return (PyObject*)tick;
@@ -243,6 +253,7 @@ PyObject* Connection_pull_tick_update(struct Connection *self, PyObject *args, P
 PyObject* Connection_subscribe(struct Connection *self, PyObject *args, PyObject *kwds)
 {
     int                id;
+    SRV_ERROR          rtn;
 
     if (!PyArg_ParseTuple(args, "i", &id))
     {
@@ -250,7 +261,7 @@ PyObject* Connection_subscribe(struct Connection *self, PyObject *args, PyObject
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_subscribe(self->m_connection, id);
+    rtn = srv_client_subscribe(self->m_connection, id);
 
     if(rtn != SRV_ERROR_SUCCESS)
     {
@@ -264,6 +275,7 @@ PyObject* Connection_subscribe(struct Connection *self, PyObject *args, PyObject
 PyObject* Connection_unsubscribe(struct Connection *self, PyObject *args, PyObject *kwds)
 {
     int                id;
+    SRV_ERROR          rtn;
 
     if (!PyArg_ParseTuple(args, "i", &id))
     {
@@ -271,7 +283,7 @@ PyObject* Connection_unsubscribe(struct Connection *self, PyObject *args, PyObje
         return NULL;
     }
 
-    SRV_ERROR rtn = srv_client_unsubscribe(self->m_connection, id);
+    rtn = srv_client_unsubscribe(self->m_connection, id);
 
     if(rtn != SRV_ERROR_SUCCESS)
     {
@@ -288,6 +300,8 @@ PyObject* Connection_wait_for_update(struct Connection *self, PyObject *args, Py
     char              *tickdata;
     size_t             len;
     struct timeval     datetime;
+    SRV_ERROR          rtn;
+    struct Tick       *tick;
 
     if (!PyArg_ParseTuple(args, "i", &id))
     {
@@ -295,7 +309,7 @@ PyObject* Connection_wait_for_update(struct Connection *self, PyObject *args, Py
         return NULL;
     }
 
-	SRV_ERROR rtn = SRV_ERROR_SUCCESS;
+	rtn = SRV_ERROR_SUCCESS;
 
 	Py_BEGIN_ALLOW_THREADS
     rtn = srv_client_wait_for_tick(self->m_connection, (void **)&tickdata, &len, &datetime);
@@ -307,8 +321,7 @@ PyObject* Connection_wait_for_update(struct Connection *self, PyObject *args, Py
         return NULL;
     }
 
-    //return Py_BuildValue("{s:s,s:d}", "Data", tickdata, "Time", ((double)datetime.tv_sec));
-	struct Tick *tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
+	tick = (struct Tick*)Tick_new(&TickType, NULL, NULL);
 	tick->data = PyString_FromString(tickdata);
 	tick->time = (double)datetime.tv_sec;
 	return (PyObject*)tick;
@@ -323,12 +336,13 @@ void Connection_dealloc(struct Connection* self)
 PyObject* Connection_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     struct Connection *self;
+    SRV_ERROR          rtn;
 
     self = (struct Connection*)type->tp_alloc(type, 0);
     if (self != NULL)
     {
         //SRV_ERROR rtn = srv_client_connect(&self->m_connection, SRV_SOCKET_TYPES_TCP_IP);
-        SRV_ERROR rtn = srv_client_connect(&self->m_connection, SRV_SOCKET_TYPES_LOCAL_PIPES);
+        rtn = srv_client_connect(&self->m_connection, SRV_SOCKET_TYPES_LOCAL_PIPES);
         if(rtn != SRV_ERROR_SUCCESS) {
             srv_seterror(
                     "could not create connection");

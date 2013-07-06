@@ -552,7 +552,7 @@ variant variant_from_string(char *c)
 {
     variant v;
     v.m_type = CORE_TYPES_VARIANT_STRING;
-    v.m_v.m_s.m_l = strlen(c);
+    v.m_v.m_s.m_l = (int)strlen(c);
     v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(v.m_v.m_s.m_l+1));
     strcpy(v.m_v.m_s.m_s, c);
     return v;
@@ -562,7 +562,7 @@ variant variant_from_error(char *c)
 {
     variant v;
     v.m_type = CORE_TYPES_VARIANT_ERROR;
-    v.m_v.m_s.m_l = strlen(c);
+    v.m_v.m_s.m_l = (int)strlen(c);
     v.m_v.m_s.m_s = (char*)malloc(sizeof(char)*(v.m_v.m_s.m_l+1));
     strcpy(v.m_v.m_s.m_s, c);
     return v;

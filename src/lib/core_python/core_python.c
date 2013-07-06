@@ -97,7 +97,7 @@ matrix core_python_py_to_matrix(PyObject* o)
 {
     if(PyList_Check(o))
     {
-        int height = PyList_Size(o);
+        int height = (int)PyList_Size(o);
         int i=0;
         int width = 1;
         matrix m;
@@ -106,7 +106,7 @@ matrix core_python_py_to_matrix(PyObject* o)
             PyObject* obj = PyList_GetItem(o, i);
             if(PyList_Check(obj))
             {
-                width = (width < PyList_Size(obj))?PyList_Size(obj):width;
+                width = (width < (int)PyList_Size(obj))?(int)PyList_Size(obj):width;
             }
         }
         m = matrix_init(width, height);
@@ -116,7 +116,7 @@ matrix core_python_py_to_matrix(PyObject* o)
             int j = 0;
             if(PyList_Check(obj))
             {
-                int size = PyList_Size(obj);
+                int size = (int)PyList_Size(obj);
                 for(;j<size;++j)
                 {
                     matrix_set(m, j, i, core_python_py_to_variant(PyList_GetItem(obj,j)));
@@ -134,7 +134,7 @@ matrix core_python_py_to_matrix(PyObject* o)
     }
     if(PyDict_Check(o))
     {
-        int height = PyDict_Size(o), width = 2;
+        int height = (int)PyDict_Size(o), width = 2;
         matrix m = matrix_init(width, height);
         PyObject *key, *value;
         Py_ssize_t pos = 0;

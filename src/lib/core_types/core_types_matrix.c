@@ -4,10 +4,6 @@
  * @brief The implementation of the matrix variant
  */
 
-#ifdef _WIN32
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <core_types/core_types_matrix.h>
 #include <stdlib.h>
 #include <stdio.h>

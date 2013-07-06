@@ -46,8 +46,8 @@ void set_core_debug_level_env(int level)
 
 void set_core_debug_group_env(char* group)
 {
-    core_debug_group_set = 0;
     char* tok = strtok(group, "|");
+    core_debug_group_set = 0;
     while(tok && (core_debug_group_set < DEBUG_GROUP_SET_SIZE))
     {
         strncpy(core_debug_group_env[core_debug_group_set], tok, DEBUG_GROUP_SIZE);
@@ -58,6 +58,7 @@ void set_core_debug_group_env(char* group)
 
 int is_core_debug_group(char* group)
 {
+    int i=0;
     if(!core_debug_group_set)
     {
         char* debug_group_env = getenv(CORE_DEBUG_GROUP_ENV_VAR);
@@ -70,7 +71,6 @@ int is_core_debug_group(char* group)
             return 1;
         }
     }
-    int i=0;
     for(;i<core_debug_group_set;++i)
     {
         if(!strncmp(core_debug_group_env[i], group, DEBUG_GROUP_SIZE))

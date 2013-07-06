@@ -54,8 +54,15 @@ typedef enum
     CORE_PYTHON_ERROR_FAILURE = 1
 } CORE_PYTHON_ERROR;
 
+#ifdef _DEBUG
+#undef _DEBUG
+#define _ISDEBUG 1
+#endif
 #include <Python.h>
-
+#ifdef _ISDEBUG
+#undef _ISDEBUG
+#define _DEBUG 1
+#endif
 /**
  * @brief Conversion helper from Python object to variant.
  */
