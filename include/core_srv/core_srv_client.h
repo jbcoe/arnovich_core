@@ -13,6 +13,7 @@
 #include <time.h>
 #else
 #include <sys/time.h>
+#include <stddef.h>
 #endif
 
 struct srv_client_connection

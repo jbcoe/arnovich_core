@@ -165,14 +165,8 @@ pydocs:
 
 .PHONY: pylib
 pylib:
-	#mkdir -p $(TMPLIBPY)/arnovich/
-	#touch $(TMPLIBPY)/arnovich/__init__.py
-	#${ECHO_CMD} '\nfrom arnovich._$(NAME) import *\n' > $(TMPLIBPY)/arnovich/$(NAME).py
-	#if [ -d $(SRCPYMODULES) ]; then cp -r ${SRCPYMODULES}/* $(TMPLIBPY)/arnovich/ ; fi
-	#$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_ARGS) --datafiles $(SRCPYDATAFILES) --files $(SRCPYFILES)
-	#$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --datafiles $(SRCPYDATAFILES) --files $(SRCPYFILES)
-	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_ARGS) --datafiles $(SRCPYMODULES) --files $(SRCPYLIB)
-	$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --datafiles $(SRCPYMODULES) --files $(SRCPYLIB)
+	$(PYTHON) $(MAKEFILEDIR)/setup.py build $(PYLIB_ARGS) --create_package --module_dir $(SRCPYMODULES) --datafiles $(SRCPYMODULES) --files $(SRCPYLIB)
+	$(PYTHON) $(MAKEFILEDIR)/setup.py install $(PYLIB_ARGS) --create_package --module_dir $(SRCPYMODULES) --datafiles $(SRCPYMODULES) --files $(SRCPYLIB)
 
 clean:
 	rm -rf $(BUILDDIR)
