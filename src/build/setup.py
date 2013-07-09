@@ -111,15 +111,22 @@ if create_package is True:
     os.write(fd, '\nfrom arnovich._' + shortname + ' import *\n')
     os.close(fd)
 
-if modules_dir is not None:
-    if os.access(modules_dir, os.F_OK):
-        for p in os.listdir(modules_dir):
-            pf = os.path.join(modules_dir, p)
+
+def deep_copy(src, target):
+    if os.access(src, os.F_OK):
+        for p in os.listdir(src):
+            pf = os.path.join(src, p)
             if os.path.isdir(pf):
-                p_name = basename(pf)
-                shutil.copytree(pf,  builddir + "/arnovich/" + p_name)
+                p_name = os.path.basename(pf)
+                deep_copy(str(pf), str(os.path.join(target, p_name)))
             elif os.path.isfile(pf):
-                shutil.copy(pf, builddir + "/arnovich/")
+                if not os.access(target, os.F_OK):
+                    os.makedirs(target)
+                shutil.copy(pf, target)
+
+
+if modules_dir is not None:
+    deep_copy(modules_dir, str(os.path.join(builddir, "arnovich")))
 
 def define_packages(package, package_dir):
     packages = [package]
@@ -139,7 +146,7 @@ def get_files(datadir, ext):
             for p in os.listdir(d):
                 pf = os.path.join(d, p)
                 if os.path.isdir(pf):
-                    dirs.extend(get_files(pf, ext))
+                    dirs.extend(get_files([pf], ext))
                 elif os.path.isfile(pf):
                     if ext == os.path.splitext(p)[1]:
                         dirs.append(pf)
@@ -147,8 +154,7 @@ def get_files(datadir, ext):
 
 data_files = get_files(datafiles, '.xsl')
 ext_dir = os.path.join(package, 'etc')
-if os.access(ext_dir, os.F_OK):
-    data_files.append(ext_dir)
+data_files = [(str(ext_dir), data_files)]
 
 files = get_files(file_dirs, '.cpp')
 files.extend(get_files(file_dirs, '.c'))

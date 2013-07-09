@@ -168,7 +168,7 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
                 break; \
             } \
             default: \
-                rtn = VARIANT_EMPTY; \
+                rtn = VARIANT_EMPTY(); \
                 break; \
             } \
             va_end(vl); \

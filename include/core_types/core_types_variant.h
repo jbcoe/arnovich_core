@@ -341,8 +341,8 @@ variant _variant_from_int(int i);
 #define variant_from_int(i) _variant_from_int(i)
 
 variant _variant_from_function(void* f, void* a, int n);
-#define variant_from_function(f, n) _variant_from_funcion(f, 0, n)
-#define variant_from_function_object(f, a, n) _variant_from_funcion(f, a, n)
+#define variant_from_function(f, n) _variant_from_function(f, 0, n)
+#define variant_from_function_object(f, a, n) _variant_from_function(f, a, n)
 
 int _variant_as_bool(variant v);
 #define variant_as_bool(v) _variant_as_bool(v)
