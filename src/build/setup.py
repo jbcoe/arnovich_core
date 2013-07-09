@@ -135,13 +135,14 @@ packages = define_packages(package, os.path.join(package_dir, package))
 def get_files(datadir, ext):
     dirs = []
     for d in datadir:
-        for p in os.listdir(d):
-            pf = os.path.join(d, p)
-            if os.path.isdir(pf):
-                dirs.extend(get_files(pf, ext))
-            elif os.path.isfile(pf):
-                if ext == os.path.splitext(p)[1]:
-                    dirs.append(pf)
+        if os.access(modules_dir, os.F_OK):
+            for p in os.listdir(d):
+                pf = os.path.join(d, p)
+                if os.path.isdir(pf):
+                    dirs.extend(get_files(pf, ext))
+                elif os.path.isfile(pf):
+                    if ext == os.path.splitext(p)[1]:
+                        dirs.append(pf)
     return dirs
 
 data_files = get_files(datafiles, '.xsl')
