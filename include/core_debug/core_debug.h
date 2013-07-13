@@ -60,6 +60,15 @@
 #ifndef CORE_DEBUG_H_
 #define CORE_DEBUG_H_
 
+// VS likes to define _DEBUG as a pre-processor macro instead of DEBUG so we change it over here
+// so always include this header last, to avoid undef'ing _DEBUG in MS headers
+#ifdef _DEBUG
+#undef _DEBUG
+#ifndef DEBUG
+#define DEBUG
+#endif
+#endif
+
 /**
  * @brief Some standard predefined debug levels.
  *

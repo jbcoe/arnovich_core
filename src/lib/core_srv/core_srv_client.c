@@ -41,6 +41,10 @@ int read(SOCKET s, void *buf, int len)
 
 #ifdef DEBUG
 
+#ifdef _DEBUG
+#undef _DEBUG
+#endif
+
 #define _DEBUG(exp, ...) \
 	{\
 		printf("%s:%i   "exp"\n", __FILE__, __LINE__, ##__VA_ARGS__); \
