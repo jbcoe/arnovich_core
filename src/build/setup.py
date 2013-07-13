@@ -142,7 +142,7 @@ packages = define_packages(package, os.path.join(package_dir, package))
 def get_files(datadir, ext):
     dirs = []
     for d in datadir:
-        if os.access(modules_dir, os.F_OK):
+        if os.access(d, os.F_OK):
             for p in os.listdir(d):
                 pf = os.path.join(d, p)
                 if os.path.isdir(pf):
