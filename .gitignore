@@ -1,4 +1,8 @@
 .cproject
 .project
 .pydevproject
+*.sdf
+*.user
+*.suo
+.DS_Store
 build/*

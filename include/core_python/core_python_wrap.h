@@ -118,10 +118,11 @@ static PyObject* PyFunc_##NAME##0(PyObject* self) \
             typedef variant (*wrapped_function4)(TYPE*, variant, variant, variant, variant); \
             typedef variant (*wrapped_function5)(TYPE*, variant, variant, variant, variant, variant); \
             va_list vl; \
-            va_start(vl, self); \
             variant rtn; \
-            TYPE* slf = (TYPE*)self; \
+            TYPE* slf = NULL; \
             void* func = FUNCTION; \
+            va_start(vl, self); \
+            slf = (TYPE*)self; \
             switch(NARGS) \
             { \
             case 0: \

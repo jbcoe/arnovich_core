@@ -161,7 +161,7 @@ public:
       */
     operator bool() const
     {
-        return (bool)CVariant::_variant_as_bool(m_v);
+        return (CVariant::_variant_as_bool(m_v) != 0);
     }
     /**
       * @brief Cast to an \c int. Returns 0 if not a int type.
@@ -280,56 +280,56 @@ public:
       */
     bool is_empty() const
     {
-        return CVariant::_variant_is_empty(m_v);
+        return (CVariant::_variant_is_empty(m_v) != 0);
     }
     /**
       * @brief Test if \c variant is a bool type.
       */
     bool is_bool() const
     {
-        return CVariant::_variant_is_bool(m_v);
+        return  (CVariant::_variant_is_bool(m_v) != 0);
     }
     /**
       * @brief Test if \c variant is an int type.
       */
     bool is_int() const
     {
-        return CVariant::_variant_is_int(m_v);
+        return (CVariant::_variant_is_int(m_v) != 0);
     }
     /**
       * @brief Test if \c variant is a double type.
       */  
     bool is_double() const
     {
-        return CVariant::_variant_is_double(m_v);
+        return (CVariant::_variant_is_double(m_v) != 0);
     }
     /**
       * @brief Test if \c variant is a string type.
       */
     bool is_string() const
     {
-        return CVariant::_variant_is_string(m_v);
+        return (CVariant::_variant_is_string(m_v) != 0);
     }
     /**
       * @brief Test if \c variant is an error type.
       */
     bool is_error() const
     {
-        return CVariant::_variant_is_error(m_v);
+        return (CVariant::_variant_is_error(m_v) != 0);
     }
     /**
       * @brief Test if \c variant is a matrix type.
       */
     bool is_matrix() const
     {
-        return CVariant::_variant_is_matrix(m_v);
+        return (CVariant::_variant_is_matrix(m_v) != 0);
     }
     /**
       * @brief Test if \c variant is a function type.
       */
     bool is_function() const
     {
-        return CVariant::_variant_is_function(m_v);
+        return (CVariant::_variant_is_function(m_v) != 0);
     }
     ///@}
 
@@ -342,7 +342,7 @@ public:
       */
     bool operator ==(const variant& v) const
     {
-        return CVariant::variant_equal(m_v, v.m_v);
+        return (CVariant::variant_equal(m_v, v.m_v) != 0);
     }
     /**
       * @brief Test whether \c this is less than \c v. 
@@ -350,7 +350,7 @@ public:
       */
     bool operator <(const variant& v) const
     {
-        return CVariant::variant_less(m_v, v.m_v);
+        return (CVariant::variant_less(m_v, v.m_v) != 0);
     }
     /**
       * @brief Test whether \c this is greater than \c v. 
@@ -358,21 +358,21 @@ public:
       */
     bool operator >(const variant& v) const
     {
-        return CVariant::variant_less(v.m_v, m_v);
+        return (CVariant::variant_less(v.m_v, m_v) != 0);
     }
     /**
       * @brief Use the \c AND operator on variants. If either variant is not of bool type then false is returned.
       */
     bool operator &&(const variant& v) const
     {
-        return CVariant::variant_and(m_v, v.m_v);
+        return (CVariant::variant_and(m_v, v.m_v) != 0);
     }
     /**
       * @brief Use the \c OR operator on variants. If either variant is not of bool type then false is returned.
       */
     bool operator ||(const variant& v) const
     {
-        return CVariant::variant_or(m_v, v.m_v);
+        return (CVariant::variant_or(m_v, v.m_v) != 0);
     }
     /**
       * @brief Add \c v to \c this. 
