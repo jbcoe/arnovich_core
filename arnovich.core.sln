@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "arnovich.core", "arnovich.core.vcxproj", "{0F3698A9-D7A8-4644-A24D-5D526DE5400D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "arnovich.core.pylib", "arnovich.core.pylib.vcxproj", "{7EF6EDB0-B80D-462D-A410-1FB58562D934}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F3698A9-D7A8-4644-A24D-5D526DE5400D} = {0F3698A9-D7A8-4644-A24D-5D526DE5400D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
