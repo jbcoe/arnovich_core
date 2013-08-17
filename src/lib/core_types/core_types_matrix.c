@@ -78,8 +78,7 @@ matrix matrix_identity(int n)
     int i;
     for(i = 0; i < n; ++i)
     {
-        variant_from_int(1);
-        //matrix_set(m, i, i, variant_from_int(1));
+        matrix_set(m, i, i, variant_from_int(1));
     }
     return m;
 }
