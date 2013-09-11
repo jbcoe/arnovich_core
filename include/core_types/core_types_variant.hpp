@@ -1,4 +1,3 @@
-
 /**
  * @file core_types_variant.hpp
  * @brief C++ interface for the variant type.
@@ -50,6 +49,9 @@ public:
     }
     const variant& operator=(const variant& v)
     {
+    	//Self-assignment protection
+    	if ( &v == this ) return *this;
+    	
         release();
         m_count = v.m_count;
         m_v = v.m_v;
